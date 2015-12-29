@@ -19,10 +19,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.TimePicker;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
@@ -35,8 +36,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import adapters.ListAlarmsAdapter;
 import adapters.ListBusAdapter;
+import entities.Alarm;
 import entities.Bus;
+import utils.AlarmPersistence;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,9 +53,17 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView listBuses;
 
+    private ListView listAlarms;
+
+    private TextView txtBusStop;
+
+    private TextView txtBusNumber;
+
+    private ImageView btnDelete;
+
     AlertDialog listDialog;
 
-    private PendingIntent pendingIntent;
+    private LocalTime timeBus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,13 +72,13 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //txttitle = (TextView) findViewById(R.id.txtLastBus);
+
+        //txttitle.setText(readDataShared());
 
         mContext = this;
 
-         /* Retrieve a PendingIntent that will perform a broadcast */
-        Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
-
-        pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, alarmIntent, 0);
+        //pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, alarmIntent, 0);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -74,8 +86,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-
-                //new LastBusAsync().execute(235,16);
 
                 AlertDialog.Builder builder =
                         new AlertDialog.Builder(mContext, R.style.AppCompatAlertDialogStyle);
@@ -86,9 +96,9 @@ public class MainActivity extends AppCompatActivity {
 
                         Dialog f = (Dialog) dialog;
 
-                        TextView txtBusStop = (TextView) f.findViewById(R.id.editTextBusStop);
+                        txtBusStop = (TextView) f.findViewById(R.id.editTextBusStop);
 
-                        TextView txtBusNumber = (TextView) f.findViewById(R.id.editTextBusNumber);
+                        txtBusNumber = (TextView) f.findViewById(R.id.editTextBusNumber);
 
                         new LastBusAsync().execute(txtBusStop.getText().toString(), txtBusNumber.getText().toString());
 
@@ -106,6 +116,12 @@ public class MainActivity extends AppCompatActivity {
         listBuses.setOnItemClickListener(evtClickBus);
 
 
+        listAlarms = (ListView) findViewById(R.id.listViewAlarms);
+
+
+        listAlarms.setOnItemClickListener(evtClickAlarm);
+
+        updateListViewAlarms();
 
         AlertDialog.Builder builderListDialog;
 
@@ -119,6 +135,28 @@ public class MainActivity extends AppCompatActivity {
         listDialog = builderListDialog.create();
 
     }
+
+    private void updateListViewAlarms(){
+
+        List<Alarm> alarms = AlarmPersistence.readStoredAlarms(mContext);
+
+        if(alarms != null) {
+            listAlarms.setAdapter(new ListAlarmsAdapter(mContext, alarms));
+        }
+    }
+
+
+    private AdapterView.OnItemClickListener evtClickAlarm = new AdapterView.OnItemClickListener() {
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            Alarm alarm = (Alarm) listAlarms.getAdapter().getItem(position);
+
+            Snackbar.make(view, "Details Alarm " + alarm.getId(), Snackbar.LENGTH_LONG)
+                    .setAction("Action", null).show();
+        }
+    };
 
 
     private AdapterView.OnItemClickListener evtClickBus = new AdapterView.OnItemClickListener() {
@@ -146,9 +184,25 @@ public class MainActivity extends AppCompatActivity {
 
                     DateTime date = new DateTime();
 
-                    date = date.plusMinutes(number.getValue());
+                    int diff = timeBus.getMinuteOfHour() - number.getValue();
 
-                    manager.set(AlarmManager.RTC_WAKEUP, date.getMillis(), pendingIntent);
+                    date = date.plusMinutes(diff);
+                    //TODO Check it out another way to control the id
+                    int alarmId = LocalTime.now().getMillisOfDay();
+
+                    Alarm myData = new Alarm(alarmId ,date.toString(), txtBusStop.getText().toString(), txtBusNumber.getText().toString(), String.valueOf(number.getValue()));
+
+                    Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
+
+                    alarmIntent.putExtra("myDataSerialized", myData.serialize());
+
+                    PendingIntent appIntent = PendingIntent.getBroadcast(mContext, alarmId, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+
+                    manager.set(AlarmManager.RTC_WAKEUP, date.getMillis(), appIntent);
+
+                    AlarmPersistence.saveAlarm(myData, mContext);
+
+                    updateListViewAlarms();
 
                 }
             });
@@ -160,14 +214,16 @@ public class MainActivity extends AppCompatActivity {
 
             NumberPicker time = (NumberPicker) v.findViewById(R.id.numberPicker2);
 
-            LocalTime timeBus = LocalTime.parse(bus.getTime());
+            timeBus = bus.getTime();
 
             LocalTime difference = timeBus.minusHours(LocalTime.now().getHourOfDay()).minusMinutes(LocalTime.now().getMinuteOfHour()).minusSeconds(LocalTime.now().getSecondOfMinute());
 
             int val = difference.getMinuteOfHour();
 
             time.setMinValue(1);
-            time.setMaxValue(val);
+            time.setMaxValue(val - 1);
+
+            time.setValue(val - 1);
 
             builder.setView(v);
 
@@ -200,8 +256,6 @@ public class MainActivity extends AppCompatActivity {
 
     public class LastBusAsync extends AsyncTask<String, List<Bus>, List<Bus>> {
 
-        String title = "";
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -220,8 +274,8 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 // Connect to the web site
-                Document document = Jsoup.connect("http://www.dublinbus.ie/en/RTPI/Sources-of-Real-Time-Information/?searchtype=view&searchquery=" + params[0]).get();
-                //Document document = Jsoup.connect("https://s3.amazonaws.com/othersdev/DUBLIN_BUS.HTML").get();
+                //Document document = Jsoup.connect("http://www.dublinbus.ie/en/RTPI/Sources-of-Real-Time-Information/?searchtype=view&searchquery=" + params[0]).get();
+                Document document = Jsoup.connect("https://s3.amazonaws.com/othersdev/DUBLIN_BUS.HTML").get();
 
                 // Get the html document title
                 Iterator<Element> table = document.select("table[id=rtpi-results]").select("tr:contains(" + params[1] + " )").iterator();
@@ -233,24 +287,20 @@ public class MainActivity extends AppCompatActivity {
                     while (table.hasNext()) {
                         Element ele = table.next();
                         String curr = ele.select("td").get(DESTINATION).text();
-                        title += curr + "\n";
+
 
                         if(!ele.select("td").get(TIME).text().equalsIgnoreCase("Due")) {
 
                             Bus newBus = new Bus();
 
-                            newBus.setTime(ele.select("td").get(TIME).text());
+                            newBus.setTime(LocalTime.parse(ele.select("td").get(TIME).text()));
                             newBus.setRoute(ele.select("td").get(ROUTE).text());
                             newBus.setDestination(ele.select("td").get(DESTINATION).text());
 
                             buses.add(newBus);
                         }
                     }
-                }else{
-                    title = "There's no buses /n \n";
-                    title += "tEST";
                 }
-
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -262,12 +312,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Bus> result) {
-            // Set title into TextView
-            TextView txttitle = (TextView) findViewById(R.id.txtLastBus);
-            txttitle.setText(title);
+
             mProgressDialog.dismiss();
 
-            listBuses.setAdapter(new ListBusAdapter(result, mContext));
+            listBuses.setAdapter(new ListBusAdapter(result, mContext, LocalTime.now()));
 
             listDialog.setView(listBuses);
 

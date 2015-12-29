@@ -1,5 +1,7 @@
 package entities;
 
+import org.joda.time.LocalTime;
+
 /**
  * Created by victor on 06/12/15.
  */
@@ -9,7 +11,7 @@ public class Bus {
 
     private String destination;
 
-    private String time;
+    private LocalTime time;
 
     public String getRoute() {
         return route;
@@ -27,16 +29,20 @@ public class Bus {
         this.destination = destination;
     }
 
-    public String getTime() {
+    public LocalTime getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(LocalTime time) {
         this.time = time;
     }
 
     @Override
     public String toString() {
-        return route + destination + time;
+        return "Bus{" +
+                "route='" + route + '\'' +
+                ", destination='" + destination + '\'' +
+                ", time='" + time + '\'' +
+                '}';
     }
 }

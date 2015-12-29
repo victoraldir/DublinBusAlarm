@@ -1,11 +1,18 @@
 package receivers;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
+import android.content.SharedPreferences;
+import android.support.v4.app.NotificationCompat;
 
+import entities.Alarm;
 import quartzo.com.dublinbusalarm.MainActivity;
+import quartzo.com.dublinbusalarm.R;
+import utils.Constants;
 
 /**
  * Created by victor on 27/08/15.
@@ -17,13 +24,36 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         //Toast.makeText(context, "I'm running", Toast.LENGTH_SHORT).show();
         Intent it = new Intent(context, MainActivity.class);
-        it.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        Bundle extras = intent.getExtras();
-        if(extras.getBoolean("isDone")){
-            it.putExtras(extras);
-        }
 
-        context.startActivity(it);
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        context,
+                        0,
+                        it,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                );
+
+        Alarm myData = Alarm.create(intent.getStringExtra("myDataSerialized"));
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(context)
+                        .setSmallIcon(R.drawable.notification)
+                        .setContentTitle("Bus " + myData.getBus() +  " is due in " + myData.getTimeDue() + " min")
+                        .setContentText("See more details bus stop " + myData.getBusStop())
+                        .setContentIntent(resultPendingIntent);
+
+        // Sets an ID for the notification
+        int mNotificationId = 001;
+        // Gets an instance of the NotificationManager service
+        NotificationManager mNotifyMgr =
+                (NotificationManager) context.getSystemService(context.NOTIFICATION_SERVICE);
+        // Builds the notification and issues it.
+        Notification notification = mBuilder.build();
+
+        notification.flags =  Notification.DEFAULT_LIGHTS | Notification.FLAG_AUTO_CANCEL;
+
+        mNotifyMgr.notify(mNotificationId, notification);
     }
+
 
 }

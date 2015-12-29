@@ -5,9 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import org.joda.time.LocalTime;
+
 import java.util.List;
 
 import entities.Bus;
@@ -21,12 +23,14 @@ public class ListBusAdapter extends BaseAdapter {
     private List<Bus> busList;
     private int busesLayoutId;
     private Context ctx;
+    private LocalTime timeCurr;
 
-    public ListBusAdapter(List<Bus> catList, Context ctx) {
+    public ListBusAdapter(List<Bus> catList, Context ctx, LocalTime timeCurr) {
 
-        this.busesLayoutId = R.layout.listviewbuses;
+        this.busesLayoutId = R.layout.layout_list_bus_adapter;
         this.busList = catList;
         this.ctx = ctx;
+        this.timeCurr = timeCurr;
 
     }
 
@@ -60,7 +64,13 @@ public class ListBusAdapter extends BaseAdapter {
 
         TextView textView = (TextView) v.findViewById(R.id.textViewBus);
 
-        textView.setText(bus.getTime());
+        TextView textViewMinutes = (TextView) v.findViewById(R.id.textViewMinutes);
+
+        textView.setText(bus.getTime().toString());
+
+        LocalTime diff = bus.getTime().minusHours(timeCurr.getHourOfDay()).minusMinutes(timeCurr.getMinuteOfHour()).minusSeconds(timeCurr.getSecondOfMinute());
+
+        textViewMinutes.setText(String.valueOf(diff.getMinuteOfHour()));
 
         return v;
     }
