@@ -7,6 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import entities.Alarm;
@@ -35,12 +37,17 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Alarm myData = Alarm.create(intent.getStringExtra("myDataSerialized"));
 
+        long[] pattern = {0, 100, 1000};
+        Uri uri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.notification)
                         .setContentTitle("Bus " + myData.getBus() +  " is due in " + myData.getTimeDue() + " min")
                         .setContentText("See more details bus stop " + myData.getBusStop())
-                        .setContentIntent(resultPendingIntent);
+                        .setContentIntent(resultPendingIntent)
+                        .setVibrate(pattern)
+                        .setSound(uri);
 
         // Sets an ID for the notification
         int mNotificationId = 001;

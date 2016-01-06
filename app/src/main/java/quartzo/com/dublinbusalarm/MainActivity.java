@@ -184,7 +184,9 @@ public class MainActivity extends AppCompatActivity {
 
                     DateTime date = new DateTime();
 
-                    int diff = timeBus.getMinuteOfHour() - number.getValue();
+                    LocalTime busTime = timeBus.minusHours(LocalTime.now().getHourOfDay()).minusMinutes(LocalTime.now().getMinuteOfHour()).minusSeconds(LocalTime.now().getSecondOfMinute());
+
+                    int diff = busTime.getMinuteOfHour() - number.getValue();
 
                     date = date.plusMinutes(diff);
                     //TODO Check it out another way to control the id
@@ -274,8 +276,8 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 // Connect to the web site
-                //Document document = Jsoup.connect("http://www.dublinbus.ie/en/RTPI/Sources-of-Real-Time-Information/?searchtype=view&searchquery=" + params[0]).get();
-                Document document = Jsoup.connect("https://s3.amazonaws.com/othersdev/DUBLIN_BUS.HTML").get();
+                Document document = Jsoup.connect("http://www.dublinbus.ie/en/RTPI/Sources-of-Real-Time-Information/?searchtype=view&searchquery=" + params[0]).get();
+                //Document document = Jsoup.connect("https://s3.amazonaws.com/othersdev/DUBLIN_BUS.HTML").get();
 
                 // Get the html document title
                 Iterator<Element> table = document.select("table[id=rtpi-results]").select("tr:contains(" + params[1] + " )").iterator();
