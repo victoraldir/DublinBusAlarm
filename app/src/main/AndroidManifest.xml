@@ -23,10 +23,16 @@
 
         <receiver android:name="receivers.AlarmReceiver">
             <intent-filter>
-                <action android:name="EXECUTE_ALARM_BUS"/>
+                <action android:name="EXECUTE_ALARM_BUS" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".LivePainelActivity"
+            android:label="@string/title_activity_live_painel"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

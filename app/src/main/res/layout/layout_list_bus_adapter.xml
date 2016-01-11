@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -7,14 +7,38 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:id="@+id/textViewBus" />
+        android:text="16"
+        android:textSize="50dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:id="@+id/textViewMinutes" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Dublin Airport via O&apos;Connell Street"
+        android:layout_marginLeft="15dp"
+        android:id="@+id/textViewDestination"
+        android:layout_alignBottom="@+id/textViewMinutes"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Large Text"
-        android:layout_marginLeft="15dp"
-        android:id="@+id/textViewMinutes" />
-</LinearLayout>
+        android:text="Route 40d"
+        android:id="@+id/textViewRoute"
+        android:layout_alignTop="@+id/textViewMinutes"
+        android:layout_alignStart="@+id/textViewDestination" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Min"
+        android:layout_marginLeft="20dp"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/textViewMinutes"
+        android:layout_alignStart="@+id/textViewMinutes" />
+</RelativeLayout>

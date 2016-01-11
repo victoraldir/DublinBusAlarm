@@ -11,7 +11,7 @@ public class Bus {
 
     private String destination;
 
-    private LocalTime time;
+    private String time;
 
     public String getRoute() {
         return route;
@@ -29,11 +29,11 @@ public class Bus {
         this.destination = destination;
     }
 
-    public LocalTime getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(LocalTime time) {
+    public void setTime(String time) {
         this.time = time;
     }
 

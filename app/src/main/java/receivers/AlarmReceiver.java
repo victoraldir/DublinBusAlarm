@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import entities.Alarm;
+import quartzo.com.dublinbusalarm.LivePainelActivity;
 import quartzo.com.dublinbusalarm.MainActivity;
 import quartzo.com.dublinbusalarm.R;
 import utils.Constants;
@@ -25,7 +26,9 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         //Toast.makeText(context, "I'm running", Toast.LENGTH_SHORT).show();
-        Intent it = new Intent(context, MainActivity.class);
+        Intent it = new Intent(context, LivePainelActivity.class);
+
+        it.putExtra("myDataSerialized", intent.getStringExtra("myDataSerialized"));
 
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(

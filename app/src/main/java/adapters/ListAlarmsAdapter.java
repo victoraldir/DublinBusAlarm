@@ -1,12 +1,15 @@
 package adapters;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -16,6 +19,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import entities.Alarm;
+import quartzo.com.dublinbusalarm.LivePainelActivity;
 import quartzo.com.dublinbusalarm.R;
 import utils.AlarmPersistence;
 
@@ -53,9 +57,28 @@ public class ListAlarmsAdapter extends ArrayAdapter<Alarm> {
 
         btnDelete.setOnClickListener(evtDelete);
 
+        convertView.setTag(position);
+
+        convertView.setClickable(true);
+
+        convertView.setFocusable(true);
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Integer taggedPosition = (Integer) v.getTag();
+                Alarm alarm =  getItem(taggedPosition);
+
+                Intent it = new Intent(getContext(), LivePainelActivity.class);
+
+                it.putExtra("myDataSerialized", alarm.serialize());
+
+                getContext().startActivity(it);
+            }
+        });
+
         return convertView;
     }
-
 
     private View.OnClickListener evtDelete = new View.OnClickListener() {
         @Override
@@ -83,4 +106,5 @@ public class ListAlarmsAdapter extends ArrayAdapter<Alarm> {
 
         }
     };
+
 }

@@ -23,7 +23,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
@@ -41,12 +40,9 @@ import adapters.ListBusAdapter;
 import entities.Alarm;
 import entities.Bus;
 import utils.AlarmPersistence;
+import utils.Constants;
 
 public class MainActivity extends AppCompatActivity {
-
-    private static final int ROUTE = 0;
-    private static final int DESTINATION = 1;
-    private static final int TIME = 2;
 
     ProgressDialog mProgressDialog;
     private Context mContext;
@@ -58,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView txtBusStop;
 
     private TextView txtBusNumber;
-
-    private ImageView btnDelete;
 
     AlertDialog listDialog;
 
@@ -118,9 +112,6 @@ public class MainActivity extends AppCompatActivity {
 
         listAlarms = (ListView) findViewById(R.id.listViewAlarms);
 
-
-        listAlarms.setOnItemClickListener(evtClickAlarm);
-
         updateListViewAlarms();
 
         AlertDialog.Builder builderListDialog;
@@ -144,20 +135,6 @@ public class MainActivity extends AppCompatActivity {
             listAlarms.setAdapter(new ListAlarmsAdapter(mContext, alarms));
         }
     }
-
-
-    private AdapterView.OnItemClickListener evtClickAlarm = new AdapterView.OnItemClickListener() {
-
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            Alarm alarm = (Alarm) listAlarms.getAdapter().getItem(position);
-
-            Snackbar.make(view, "Details Alarm " + alarm.getId(), Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show();
-        }
-    };
-
 
     private AdapterView.OnItemClickListener evtClickBus = new AdapterView.OnItemClickListener() {
 
@@ -189,10 +166,11 @@ public class MainActivity extends AppCompatActivity {
                     int diff = busTime.getMinuteOfHour() - number.getValue();
 
                     date = date.plusMinutes(diff);
+                    //date = date.plusSeconds(10);
                     //TODO Check it out another way to control the id
                     int alarmId = LocalTime.now().getMillisOfDay();
 
-                    Alarm myData = new Alarm(alarmId ,date.toString(), txtBusStop.getText().toString(), txtBusNumber.getText().toString(), String.valueOf(number.getValue()));
+                    Alarm myData = new Alarm(alarmId ,date.toString(), txtBusNumber.getText().toString(), txtBusStop.getText().toString(), String.valueOf(number.getValue()));
 
                     Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
 
@@ -216,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
 
             NumberPicker time = (NumberPicker) v.findViewById(R.id.numberPicker2);
 
-            timeBus = bus.getTime();
+            timeBus = LocalTime.parse(bus.getTime());
 
             LocalTime difference = timeBus.minusHours(LocalTime.now().getHourOfDay()).minusMinutes(LocalTime.now().getMinuteOfHour()).minusSeconds(LocalTime.now().getSecondOfMinute());
 
@@ -288,16 +266,16 @@ public class MainActivity extends AppCompatActivity {
 
                     while (table.hasNext()) {
                         Element ele = table.next();
-                        String curr = ele.select("td").get(DESTINATION).text();
+                        String curr = ele.select("td").get(Constants.DESTINATION).text();
 
 
-                        if(!ele.select("td").get(TIME).text().equalsIgnoreCase("Due")) {
+                        if(!ele.select("td").get(Constants.TIME).text().equalsIgnoreCase("Due")) {
 
                             Bus newBus = new Bus();
 
-                            newBus.setTime(LocalTime.parse(ele.select("td").get(TIME).text()));
-                            newBus.setRoute(ele.select("td").get(ROUTE).text());
-                            newBus.setDestination(ele.select("td").get(DESTINATION).text());
+                            newBus.setTime(ele.select("td").get(Constants.TIME).text());
+                            newBus.setRoute(ele.select("td").get(Constants.ROUTE).text());
+                            newBus.setDestination(ele.select("td").get(Constants.DESTINATION).text());
 
                             buses.add(newBus);
                         }

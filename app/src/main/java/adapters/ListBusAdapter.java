@@ -62,16 +62,27 @@ public class ListBusAdapter extends BaseAdapter {
 
         Bus bus = busList.get(position);
 
-        TextView textView = (TextView) v.findViewById(R.id.textViewBus);
+        TextView textViewRoute = (TextView) v.findViewById(R.id.textViewRoute);
 
         TextView textViewMinutes = (TextView) v.findViewById(R.id.textViewMinutes);
 
-        textView.setText(bus.getTime().toString());
+        TextView textViewDestination = (TextView) v.findViewById(R.id.textViewDestination);
 
-        LocalTime diff = bus.getTime().minusHours(timeCurr.getHourOfDay()).minusMinutes(timeCurr.getMinuteOfHour()).minusSeconds(timeCurr.getSecondOfMinute());
+        textViewRoute.setText("Route " + bus.getRoute());
 
-        textViewMinutes.setText(String.valueOf(diff.getMinuteOfHour()));
+        textViewDestination.setText(bus.getDestination());
+
+        if(!bus.getTime().equalsIgnoreCase("due")) {
+            LocalTime diff = LocalTime.parse(bus.getTime()).minusHours(timeCurr.getHourOfDay()).minusMinutes(timeCurr.getMinuteOfHour()).minusSeconds(timeCurr.getSecondOfMinute());
+            textViewMinutes.setText(String.valueOf(diff.getMinuteOfHour()));
+        }else{
+            textViewMinutes.setText(bus.getTime());
+        }
+
+
 
         return v;
     }
+
+
 }
