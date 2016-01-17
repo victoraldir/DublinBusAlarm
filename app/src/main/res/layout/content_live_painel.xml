@@ -25,7 +25,8 @@
         android:id="@+id/viewswitcher"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textViewBusStop">
+        android:layout_below="@+id/textViewBusStop"
+        xmlns:android="http://schemas.android.com/apk/res/android">
 
 
         <ProgressBar
@@ -35,18 +36,14 @@
             style="?android:attr/progressBarStyleLarge">
         </ProgressBar>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical" >
-
-            <ListView
+        <android.support.v7.widget.RecyclerView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/listViewBusLive"></ListView>
+                android:id="@+id/listViewBusLive">
 
-        </LinearLayout>
+        </android.support.v7.widget.RecyclerView>
+
+
     </ViewSwitcher>
 
 </RelativeLayout>

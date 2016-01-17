@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.animation.Animation;
@@ -36,7 +39,7 @@ public class LivePainelActivity extends AppCompatActivity {
 
     private  TextView txtBusStop;
 
-    private ListView listBusesLive;
+    private RecyclerView listBusesLive;
 
     ViewSwitcher viewSwitcher;
 
@@ -66,7 +69,12 @@ public class LivePainelActivity extends AppCompatActivity {
 
         mContext = getApplicationContext();
 
-        listBusesLive = (ListView) findViewById(R.id.listViewBusLive);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
+        layoutManager.setOrientation(GridLayoutManager.VERTICAL);
+
+        listBusesLive = (RecyclerView) findViewById(R.id.listViewBusLive);
+
+        listBusesLive.setLayoutManager(layoutManager);
 
         slide_in_left = AnimationUtils.loadAnimation(this,
                 android.R.anim.fade_in);
@@ -150,7 +158,7 @@ public class LivePainelActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<Bus> result) {
 
-            listBusesLive.setAdapter(new ListBusAdapter(result, mContext, LocalTime.now()));
+            listBusesLive.setAdapter(new ListBusAdapter(result, mContext));
 
             viewSwitcher.showNext();
 

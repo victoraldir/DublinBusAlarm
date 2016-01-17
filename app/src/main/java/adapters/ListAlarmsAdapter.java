@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,85 +27,119 @@ import utils.AlarmPersistence;
 /**
  * Created by victor on 28/12/15.
  */
-public class ListAlarmsAdapter extends ArrayAdapter<Alarm> {
+public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.AlarmViewHolder> implements AdapterView.OnItemClickListener {
 
-    public ListAlarmsAdapter(Context context, List<Alarm> alarms) {
-        super(context, 0, alarms);
+    Context mContext;
+    List<Alarm> alarms;
+
+    public ListAlarmsAdapter(Context mContext, List<Alarm> alarms) {
+        this.mContext = mContext;
+        this.alarms = alarms;
     }
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.layout_list_alarms_adapter, parent, false);
-        }
-
-
-        Alarm alarm = getItem(position);
-
-        TextView txtBusNumber = (TextView) convertView.findViewById(R.id.textViewBusNumber);
-        TextView txtStopNumber = (TextView) convertView.findViewById(R.id.textViewStopNumber);
-        TextView txtTimeNotif = (TextView) convertView.findViewById(R.id.textViewTimeNotification);
-
-        txtStopNumber.setText("Bus stop " + alarm.getBusStop());
-        txtBusNumber.setText("Bus number " + alarm.getBus());
-        txtTimeNotif.setText("ID Alarm is.. " + alarm.getId());
-
-
-        ImageView btnDelete = (ImageView) convertView.findViewById(R.id.imageViewDelete);
-
-        btnDelete.setTag(position);
-
-        btnDelete.setOnClickListener(evtDelete);
-
-        convertView.setTag(position);
-
-        convertView.setClickable(true);
-
-        convertView.setFocusable(true);
-
-        convertView.setOnClickListener(new View.OnClickListener() {
+    private View.OnClickListener evtClickAlarm = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Integer taggedPosition = (Integer) v.getTag();
-                Alarm alarm =  getItem(taggedPosition);
+                //Integer taggedPosition = (Integer) v.getTag();
+                //Alarm alarm =  alarms.get(taggedPosition);
+                Alarm alarm = (Alarm) v.getTag();
 
-                Intent it = new Intent(getContext(), LivePainelActivity.class);
+                Intent it = new Intent(mContext, LivePainelActivity.class);
 
                 it.putExtra("myDataSerialized", alarm.serialize());
 
-                getContext().startActivity(it);
+                mContext.startActivity(it);
             }
-        });
-
-        return convertView;
-    }
+        };
 
     private View.OnClickListener evtDelete = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Integer taggedPosition = (Integer) v.getTag();
+            //Integer taggedPosition = (Integer) v.getTag();
 
-            AlarmManager manager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
+            AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
-            Alarm alam =  getItem(taggedPosition);
+            //Alarm alarm =  alarms.get(taggedPosition);
+            Alarm alarm = (Alarm) v.getTag();
 
             Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
 
-            manager.cancel(PendingIntent.getBroadcast(getContext(), alam.getId(), alarmIntent, PendingIntent.FLAG_ONE_SHOT));
+            manager.cancel(PendingIntent.getBroadcast(mContext, alarm.getId(), alarmIntent, PendingIntent.FLAG_ONE_SHOT));
 
-            AlarmPersistence.deleteAlarm(alam, getContext());
+            AlarmPersistence.deleteAlarm(alarm, mContext);
 
-            remove(alam);
+            alarms.remove(alarm);
 
-            Toast toast = Toast.makeText(getContext(), "Deleted " + alam.toString(), Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(mContext, "Deleted " + alarm.toString(), Toast.LENGTH_SHORT);
             toast.show();
-
-            ListView mainListView = (ListView) v.getRootView().findViewById(R.id.listViewAlarms);
 
             notifyDataSetChanged();
 
         }
     };
 
+    @Override
+    public AlarmViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.layout_list_alarms_adapter, parent, false);
+
+        return new AlarmViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(AlarmViewHolder holder, int position) {
+
+        Alarm alarm = alarms.get(position);
+
+        holder.txtStopNumber.setText("Bus stop " + alarm.getBusStop());
+        holder.txtBusNumber.setText("Bus number " + alarm.getBus());
+        holder.txtTimeNotif.setText("ID Alarm is.. " + alarm.getId());
+
+        holder.btnDelete.setOnClickListener(evtDelete);
+        holder.btnDelete.setTag(alarm);
+
+        holder.itemView.setOnClickListener(evtClickAlarm);
+
+        holder.itemView.setTag(alarm);
+    }
+
+    @Override
+    public int getItemCount() {
+        if(alarms == null){
+            return 0;
+        }
+        return alarms.size();
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        Alarm alarm =  alarms.get(position);
+
+        Intent it = new Intent(mContext, LivePainelActivity.class);
+
+        it.putExtra("myDataSerialized", alarm.serialize());
+
+        mContext.startActivity(it);
+    }
+
+    public static class AlarmViewHolder extends RecyclerView.ViewHolder {
+
+        public TextView txtBusNumber;
+        public TextView txtStopNumber;
+        public TextView txtTimeNotif;
+        ImageView btnDelete;
+
+        public AlarmViewHolder(View v) {
+            super(v);
+
+            txtBusNumber = (TextView) v.findViewById(R.id.textViewBusNumber);
+
+            txtStopNumber = (TextView) v.findViewById(R.id.textViewStopNumber);
+
+            txtTimeNotif = (TextView) v.findViewById(R.id.textViewTimeNotification);
+
+            btnDelete = (ImageView) v.findViewById(R.id.imageViewDelete);
+
+        }
+    }
 }

@@ -13,11 +13,15 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -47,9 +51,9 @@ public class MainActivity extends AppCompatActivity {
     ProgressDialog mProgressDialog;
     private Context mContext;
 
-    private ListView listBuses;
+    private RecyclerView listBuses;
 
-    private ListView listAlarms;
+    private RecyclerView listAlarms;
 
     private TextView txtBusStop;
 
@@ -100,17 +104,30 @@ public class MainActivity extends AppCompatActivity {
                 });
                 builder.setNegativeButton("Cancel", null);
                 builder.setView(R.layout.customdialogform);
+
                 builder.show();
             }
         });
 
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
+        layoutManager.setOrientation(GridLayoutManager.VERTICAL);
 
-        listBuses = new ListView(mContext);
+        final LinearLayoutManager layoutManager1 = new LinearLayoutManager(mContext);
+        layoutManager1.setOrientation(LinearLayoutManager.VERTICAL);
 
-        listBuses.setOnItemClickListener(evtClickBus);
+        listBuses = new RecyclerView(mContext);
 
+        //listBuses.setOnItemClickListener(evtClickBus);
 
-        listAlarms = (ListView) findViewById(R.id.listViewAlarms);
+        listAlarms = (RecyclerView) findViewById(R.id.listViewAlarms);
+
+        listBuses.setLayoutManager(layoutManager);
+
+        listAlarms.setLayoutManager(layoutManager1);
+
+        listAlarms.setHasFixedSize(true);
+
+        listBuses.setHasFixedSize(true);
 
         updateListViewAlarms();
 
@@ -125,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
 
         listDialog = builderListDialog.create();
 
+
     }
 
     private void updateListViewAlarms(){
@@ -136,12 +154,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private AdapterView.OnItemClickListener evtClickBus = new AdapterView.OnItemClickListener() {
+    private AdapterView.OnClickListener evtClickBus = new AdapterView.OnClickListener() {
 
         @Override
-        public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+        public void onClick(final View view) {
 
-            Bus bus = (Bus) listBuses.getAdapter().getItem(position);
+//            Bus bus = (Bus) listBuses.getAdapter().getItem(position);
+            final Bus bus = (Bus) view.getTag();
 
             listDialog.cancel();
 
@@ -190,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
 
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
                     (Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.customdialogtimepicker, parent, false);
+            View v = inflater.inflate(R.layout.customdialogtimepicker, (ViewGroup) view, false);
 
             NumberPicker time = (NumberPicker) v.findViewById(R.id.numberPicker2);
 
@@ -295,7 +314,7 @@ public class MainActivity extends AppCompatActivity {
 
             mProgressDialog.dismiss();
 
-            listBuses.setAdapter(new ListBusAdapter(result, mContext, LocalTime.now()));
+            listBuses.setAdapter(new ListBusAdapter(result, mContext, listDialog, evtClickBus));
 
             listDialog.setView(listBuses);
 
