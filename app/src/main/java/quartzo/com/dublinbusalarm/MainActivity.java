@@ -23,8 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.CheckBox;
 import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -46,7 +45,7 @@ import adapters.ListBusAdapter;
 import entities.Alarm;
 import entities.Bus;
 import utils.AlarmPersistence;
-import utils.Constants;
+import entities.Constants;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -64,6 +63,8 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog listDialog;
 
     private LocalTime timeBus;
+
+    private Alarm alarmChosenSwitch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         builderListDialog =
                 new AlertDialog.Builder(mContext, R.style.AppCompatAlertDialogStyle);
 
-        builderListDialog.setTitle("List bus");
+        builderListDialog.setTitle("Pick a bus");
 
         builderListDialog.setNegativeButton("Cancel", null);
 
@@ -170,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(swt.isChecked()) {
                 Alarm alarm = (Alarm) v.getTag();
-
+                alarmChosenSwitch = alarm;
                 new LastBusAsync().execute(alarm.getBusStop(), alarm.getBus());
             }else{
                 AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
@@ -199,6 +200,10 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(final View view) {
 
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
+                    (Context.LAYOUT_INFLATER_SERVICE);
+            View v = inflater.inflate(R.layout.customdialogtimepicker, (ViewGroup) view, false);
+
 //            Bus bus = (Bus) listBuses.getAdapter().getItem(position);
             final Bus bus = (Bus) view.getTag();
 
@@ -206,6 +211,11 @@ public class MainActivity extends AppCompatActivity {
 
             AlertDialog.Builder builder =
                     new AlertDialog.Builder(mContext, R.style.AppCompatAlertDialogStyle);
+
+            CheckBox checkBoxVibrate = (CheckBox) v.findViewById(R.id.checkBoxVibrate);
+
+            CheckBox checkBoxSound = (CheckBox) v.findViewById(R.id.checkBoxSound);
+
 
             builder.setTitle("Set alert options");
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -217,6 +227,10 @@ public class MainActivity extends AppCompatActivity {
                     NumberPicker number = (NumberPicker) f.findViewById(R.id.numberPicker2);
 
                     AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+
+                    CheckBox checkBoxVibrate = (CheckBox) f.findViewById(R.id.checkBoxVibrate);
+
+                    CheckBox checkBoxSound = (CheckBox) f.findViewById(R.id.checkBoxSound);
 
                     DateTime date = new DateTime();
 
@@ -230,7 +244,20 @@ public class MainActivity extends AppCompatActivity {
                     int alarmId = LocalTime.now().getMillisOfDay();
 
                     //Alarm myData = new Alarm(alarmId ,date.toString(), txtBusNumber.getText().toString(), txtBusStop.getText().toString(), String.valueOf(number.getValue()), true);
-                    Alarm myData = new Alarm(alarmId ,date.toString(), txtBusNumber.getText().toString(), txtBusStop.getText().toString(), String.valueOf(number.getValue()), true);
+
+                    Alarm myData;
+
+                    if (txtBusNumber == null) {
+                        myData = alarmChosenSwitch;
+                        myData.setIsActive(true);
+
+                    } else{
+                        myData = new Alarm(alarmId, date.toString(), txtBusNumber.getText().toString(),
+                                txtBusStop.getText().toString(), String.valueOf(number.getValue()),
+                                true, checkBoxVibrate.isChecked(), checkBoxSound.isChecked());
+
+                    }
+
                     Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
 
                     alarmIntent.putExtra("myDataSerialized", myData.serialize());
@@ -245,11 +272,21 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
+
+            if (txtBusNumber == null) {
+
+                checkBoxSound.setSelected(alarmChosenSwitch.isSound());
+                checkBoxVibrate.setSelected(alarmChosenSwitch.isVibrate());
+
+            } else{
+
+                checkBoxSound.setSelected(true);
+                checkBoxVibrate.setSelected(true);
+            }
+
             builder.setNegativeButton("Cancel", null);
 
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
-                    (Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.customdialogtimepicker, (ViewGroup) view, false);
+
 
             NumberPicker time = (NumberPicker) v.findViewById(R.id.numberPicker2);
 
@@ -271,13 +308,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//
+//        return true;
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

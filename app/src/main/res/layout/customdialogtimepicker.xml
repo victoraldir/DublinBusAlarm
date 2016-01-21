@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Vibrate"
-            android:id="@+id/checkBox"
+            android:id="@+id/checkBoxVibrate"
             android:layout_gravity="center_horizontal"
             android:checked="false" />
 
@@ -36,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Audible Alert"
-            android:id="@+id/checkBox2"
+            android:id="@+id/checkBoxSound"
             android:checked="false" />
 
     </LinearLayout>

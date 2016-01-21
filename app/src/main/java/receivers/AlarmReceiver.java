@@ -6,16 +6,14 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import entities.Alarm;
 import quartzo.com.dublinbusalarm.LivePainelActivity;
-import quartzo.com.dublinbusalarm.MainActivity;
 import quartzo.com.dublinbusalarm.R;
-import utils.Constants;
+import utils.AlarmPersistence;
 
 /**
  * Created by victor on 27/08/15.
@@ -46,11 +44,20 @@ public class AlarmReceiver extends BroadcastReceiver {
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.notification)
-                        .setContentTitle("Bus " + myData.getBus() +  " is due in " + myData.getTimeDue() + " min")
+                        .setContentTitle("Bus " + myData.getBus() + " is due in " + myData.getTimeDue() + " min")
                         .setContentText("See more details bus stop " + myData.getBusStop())
-                        .setContentIntent(resultPendingIntent)
-                        .setVibrate(pattern)
-                        .setSound(uri);
+                        .setContentIntent(resultPendingIntent);
+
+        if(myData.isVibrate()){
+            mBuilder.setVibrate(pattern);
+        }
+
+        if(myData.isSound()){
+            mBuilder.setSound(uri);
+        }
+
+        myData.setIsActive(false);
+        AlarmPersistence.saveAlarm(myData,context);
 
         // Sets an ID for the notification
         int mNotificationId = 001;

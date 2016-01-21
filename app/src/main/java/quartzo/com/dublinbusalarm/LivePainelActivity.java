@@ -1,24 +1,16 @@
 package quartzo.com.dublinbusalarm;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.ViewSwitcher;
 
-import org.joda.time.LocalTime;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,7 +25,7 @@ import java.util.TimerTask;
 import adapters.ListBusAdapter;
 import entities.Alarm;
 import entities.Bus;
-import utils.Constants;
+import entities.Constants;
 
 public class LivePainelActivity extends AppCompatActivity {
 
@@ -67,7 +59,10 @@ public class LivePainelActivity extends AppCompatActivity {
 
         //viewSwitcher = (ViewSwitcher) findViewById(R.id.viewswitcher);
 
-        mContext = getApplicationContext();
+        getSupportActionBar().setTitle("Bus stop " + myData.getBusStop());
+        getSupportActionBar().setSubtitle("Real time");
+
+        mContext = this;
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         layoutManager.setOrientation(GridLayoutManager.VERTICAL);

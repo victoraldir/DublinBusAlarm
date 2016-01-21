@@ -7,7 +7,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="16"
+        android:text="Due"
         android:textSize="50dp"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="15dp"
@@ -18,10 +18,9 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="Dublin Airport via O&apos;Connell Street"
-        android:layout_marginLeft="15dp"
         android:id="@+id/textViewDestination"
         android:layout_alignBottom="@+id/textViewMinutes"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignStart="@+id/textViewRoute" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,7 +29,8 @@
         android:text="Route 40d"
         android:id="@+id/textViewRoute"
         android:layout_alignTop="@+id/textViewMinutes"
-        android:layout_alignStart="@+id/textViewDestination" />
+        android:layout_toEndOf="@+id/textViewMinutes"
+        android:layout_marginStart="25dp" />
 
     <TextView
         android:layout_width="wrap_content"

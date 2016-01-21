@@ -7,11 +7,11 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import entities.Alarm;
+import entities.Constants;
 
 /**
  * Created by victor on 28/12/15.

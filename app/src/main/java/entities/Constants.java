@@ -1,4 +1,4 @@
-package utils;
+package entities;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

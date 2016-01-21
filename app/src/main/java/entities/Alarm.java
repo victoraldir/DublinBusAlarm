@@ -19,16 +19,22 @@ public class Alarm {
 
     private boolean isActive;
 
+    private boolean isVibrate;
+
+    private boolean isSound;
+
     public Alarm() {
     }
 
-    public Alarm(int id, String time, String bus, String busStop, String timeDue, boolean isActive) {
+    public Alarm(int id, String time, String bus, String busStop, String timeDue, boolean isActive, boolean isVibrate, boolean isSound) {
         this.id = id;
         this.time = time;
         this.bus = bus;
         this.busStop = busStop;
         this.timeDue = timeDue;
         this.isActive = isActive;
+        this.isVibrate = isVibrate;
+        this.isSound = isSound;
     }
 
     public String serialize() {
@@ -63,7 +69,21 @@ public class Alarm {
         return bus;
     }
 
+    public boolean isSound() {
+        return isSound;
+    }
 
+    public void setIsSound(boolean isSound) {
+        this.isSound = isSound;
+    }
+
+    public boolean isVibrate() {
+        return isVibrate;
+    }
+
+    public void setIsVibrate(boolean isVibrate) {
+        this.isVibrate = isVibrate;
+    }
 
     public String getBusStop() {
         return busStop;
@@ -87,6 +107,8 @@ public class Alarm {
                 ", bus='" + bus + '\'' +
                 ", busStop='" + busStop + '\'' +
                 ", isActive=" + isActive +
+                ", isVibrate=" + isVibrate +
+                ", isSound=" + isSound +
                 '}';
     }
 
