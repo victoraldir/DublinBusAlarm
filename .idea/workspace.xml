@@ -26,31 +26,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b50cb4f4-5956-476d-a906-72d1a76571d9" name="Default" comment="new features">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/dialogs/FireMissilesDialogFragment.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/android_joda_2_8_2.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/appcompat_v7_22_2_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/design_22_2_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/gson_2_3_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/joda_time_2_8_2_no_tzdb.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/jsoup_1_8_3.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/support_annotations_22_2_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/support_v4_22_2_1.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/src/main/res/layout/customdialoglist.xml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/app/src/main/res/layout/test_layout.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/entities/Alarm.java" afterPath="$PROJECT_DIR$/app/src/main/java/entities/Alarm.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/utils/AlarmPersistence.java" afterPath="$PROJECT_DIR$/app/src/main/java/utils/AlarmPersistence.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/utils/Constants.java" afterPath="$PROJECT_DIR$/app/src/main/java/utils/Constants.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/adapters/ListAlarmsAdapter.java" afterPath="$PROJECT_DIR$/app/src/main/java/adapters/ListAlarmsAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/quartzo/com/dublinbusalarm/LivePainelActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/quartzo/com/dublinbusalarm/LivePainelActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/quartzo/com/dublinbusalarm/MainActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/quartzo/com/dublinbusalarm/MainActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_live_painel.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_live_painel.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/content_live_painel.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/content_live_painel.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/content_main.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/content_main.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/customdialogtimepicker.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/customdialogtimepicker.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/layout/layout_list_alarms_adapter.xml" afterPath="$PROJECT_DIR$/app/src/main/res/layout/layout_list_alarms_adapter.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="DublinBusAlarm.iws" />
@@ -82,8 +57,8 @@
       <file leaf-file-name="styles.xml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/res/values/styles.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.7297297">
-              <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.4054054">
+              <caret line="10" column="12" selection-start-line="10" selection-start-column="12" selection-end-line="10" selection-end-column="12" />
               <folding />
             </state>
           </provider>
@@ -2144,7 +2119,13 @@
       <option name="project" value="LOCAL" />
       <updated>1453065786105</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="new features">
+      <created>1453339322693</created>
+      <option name="number" value="00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1453339322693</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -2227,9 +2208,9 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="new features" />
     <MESSAGE value="recicleviews and view holders." />
-    <option name="LAST_COMMIT_MESSAGE" value="recicleviews and view holders." />
+    <MESSAGE value="new features" />
+    <option name="LAST_COMMIT_MESSAGE" value="new features" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2436,6 +2417,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.33274648">
           <caret line="143" column="48" selection-start-line="143" selection-start-column="48" selection-end-line="143" selection-end-column="48" />
+          <folding>
+            <element signature="e#5102#5103#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2472,6 +2456,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="13" column="24" selection-start-line="13" selection-start-column="24" selection-end-line="13" selection-end-column="24" />
+          <folding>
+            <element signature="e#459#460#0" expanded="false" />
+            <element signature="e#505#506#0" expanded="false" />
+            <element signature="e#536#537#0" expanded="false" />
+            <element signature="e#563#564#0" expanded="false" />
+            <element signature="e#603#604#0" expanded="false" />
+            <element signature="e#635#636#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2479,6 +2471,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="20" column="0" selection-start-line="20" selection-start-column="0" selection-end-line="20" selection-end-column="0" />
+          <folding>
+            <element signature="e#1252#1253#0" expanded="false" />
+            <element signature="e#1278#1279#0" expanded="false" />
+            <element signature="e#1314#1315#0" expanded="false" />
+            <element signature="e#1344#1345#0" expanded="false" />
+            <element signature="e#1378#1379#0" expanded="false" />
+            <element signature="e#1409#1410#0" expanded="false" />
+            <element signature="e#1458#1459#0" expanded="false" />
+            <element signature="e#1498#1499#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2527,6 +2529,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="17" column="6" selection-start-line="17" selection-start-column="6" selection-end-line="17" selection-end-column="6" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -2664,8 +2669,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/res/values/styles.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7297297">
-          <caret line="18" column="0" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.4054054">
+          <caret line="10" column="12" selection-start-line="10" selection-start-column="12" selection-end-line="10" selection-end-column="12" />
           <folding />
         </state>
       </provider>
