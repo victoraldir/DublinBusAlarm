@@ -17,15 +17,18 @@ public class Alarm {
 
     private String busStop;
 
+    private boolean isActive;
+
     public Alarm() {
     }
 
-    public Alarm(int id, String time, String bus, String busStop, String timeDue) {
+    public Alarm(int id, String time, String bus, String busStop, String timeDue, boolean isActive) {
         this.id = id;
         this.time = time;
         this.bus = bus;
         this.busStop = busStop;
         this.timeDue = timeDue;
+        this.isActive = isActive;
     }
 
     public String serialize() {
@@ -60,8 +63,19 @@ public class Alarm {
         return bus;
     }
 
+
+
     public String getBusStop() {
         return busStop;
+    }
+
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setIsActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     @Override
@@ -72,6 +86,7 @@ public class Alarm {
                 ", timeDue='" + timeDue + '\'' +
                 ", bus='" + bus + '\'' +
                 ", busStop='" + busStop + '\'' +
+                ", isActive=" + isActive +
                 '}';
     }
 

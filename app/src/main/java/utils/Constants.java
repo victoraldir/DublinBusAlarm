@@ -1,5 +1,8 @@
 package utils;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 /**
  * Created by victor on 27/12/15.
  */
@@ -11,5 +14,9 @@ public class Constants {
     public static final int ROUTE = 0;
     public static final int DESTINATION = 1;
     public static final int TIME = 2;
+
+    //public static final String URL_DUBLIN_BUS = "https://s3.amazonaws.com/othersdev/DUBLIN_BUS.HTML";
+    public static final String URL_DUBLIN_BUS = "http://www.dublinbus.ie/en/RTPI/Sources-of-Real-Time-Information/?searchtype=view&searchquery=";
+
 
 }

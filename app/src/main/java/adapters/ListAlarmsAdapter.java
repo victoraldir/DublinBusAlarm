@@ -14,6 +14,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,14 +29,16 @@ import utils.AlarmPersistence;
 /**
  * Created by victor on 28/12/15.
  */
-public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.AlarmViewHolder> implements AdapterView.OnItemClickListener {
+public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.AlarmViewHolder> {
 
     Context mContext;
     List<Alarm> alarms;
+    View.OnClickListener evtSwitcherAlarm;
 
-    public ListAlarmsAdapter(Context mContext, List<Alarm> alarms) {
+    public ListAlarmsAdapter(Context mContext, List<Alarm> alarms, View.OnClickListener evtSwitcherAlarm) {
         this.mContext = mContext;
         this.alarms = alarms;
+        this.evtSwitcherAlarm = evtSwitcherAlarm;
     }
 
     private View.OnClickListener evtClickAlarm = new View.OnClickListener() {
@@ -100,6 +104,13 @@ public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.Al
         holder.itemView.setOnClickListener(evtClickAlarm);
 
         holder.itemView.setTag(alarm);
+
+        holder.switchAlarm.setOnClickListener(evtSwitcherAlarm);
+
+        holder.switchAlarm.setTag(alarm);
+
+        holder.switchAlarm.setChecked(alarm.isActive());
+
     }
 
     @Override
@@ -110,24 +121,13 @@ public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.Al
         return alarms.size();
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-        Alarm alarm =  alarms.get(position);
-
-        Intent it = new Intent(mContext, LivePainelActivity.class);
-
-        it.putExtra("myDataSerialized", alarm.serialize());
-
-        mContext.startActivity(it);
-    }
-
     public static class AlarmViewHolder extends RecyclerView.ViewHolder {
 
         public TextView txtBusNumber;
         public TextView txtStopNumber;
         public TextView txtTimeNotif;
-        ImageView btnDelete;
+        public ImageView btnDelete;
+        public Switch switchAlarm;
 
         public AlarmViewHolder(View v) {
             super(v);
@@ -139,6 +139,8 @@ public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.Al
             txtTimeNotif = (TextView) v.findViewById(R.id.textViewTimeNotification);
 
             btnDelete = (ImageView) v.findViewById(R.id.imageViewDelete);
+
+            switchAlarm = (Switch) v.findViewById(R.id.seekBarAlarm);
 
         }
     }

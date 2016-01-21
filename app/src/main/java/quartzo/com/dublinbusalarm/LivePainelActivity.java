@@ -37,11 +37,11 @@ import utils.Constants;
 
 public class LivePainelActivity extends AppCompatActivity {
 
-    private  TextView txtBusStop;
+    //private  TextView txtBusStop;
 
     private RecyclerView listBusesLive;
 
-    ViewSwitcher viewSwitcher;
+    //ViewSwitcher viewSwitcher;
 
     Animation slide_in_left, slide_out_right;
 
@@ -61,11 +61,11 @@ public class LivePainelActivity extends AppCompatActivity {
 
         myData = Alarm.create(getIntent().getStringExtra("myDataSerialized"));
 
-        txtBusStop = (TextView) findViewById(R.id.textViewBusStop);
+        //txtBusStop = (TextView) findViewById(R.id.textViewBusStop);
 
-        txtBusStop.setText(myData.getBusStop());
+        //txtBusStop.setText(myData.getBusStop());
 
-        viewSwitcher = (ViewSwitcher) findViewById(R.id.viewswitcher);
+        //viewSwitcher = (ViewSwitcher) findViewById(R.id.viewswitcher);
 
         mContext = getApplicationContext();
 
@@ -81,22 +81,13 @@ public class LivePainelActivity extends AppCompatActivity {
         slide_out_right = AnimationUtils.loadAnimation(this,
                 android.R.anim.fade_out);
 
-        viewSwitcher.setInAnimation(slide_in_left);
-        viewSwitcher.setOutAnimation(slide_out_right);
+        //viewSwitcher.setInAnimation(slide_in_left);
+        //viewSwitcher.setOutAnimation(slide_out_right);
 
         isFirsLoad = true;
 
         new LastBusAsync().execute(myData.getBusStop());
 
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
     public class LastBusAsync extends AsyncTask<String, List<Bus>, List<Bus>> {
@@ -104,11 +95,11 @@ public class LivePainelActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            if(!isFirsLoad){
-                viewSwitcher.getNextView();
-            }else{
-                isFirsLoad = false;
-            }
+//            if(!isFirsLoad){
+//                viewSwitcher.getNextView();
+//            }else{
+//                isFirsLoad = false;
+//            }
 
 
         }
@@ -121,8 +112,8 @@ public class LivePainelActivity extends AppCompatActivity {
             try {
 
                 // Connect to the web site
-                Document document = Jsoup.connect("http://www.dublinbus.ie/en/RTPI/Sources-of-Real-Time-Information/?searchtype=view&searchquery=" + params[0]).get();
-                //Document document = Jsoup.connect("https://s3.amazonaws.com/othersdev/DUBLIN_BUS.HTML").get();
+                Document document = Jsoup.connect(Constants.URL_DUBLIN_BUS + params[0]).get();
+                //Document document = Jsoup.connect(Constants.URL_DUBLIN_BUS).get();
 
                 // Get the html document title
                 Iterator<Element> table = document.select("table[id=rtpi-results]").select("tr").iterator();
@@ -140,6 +131,7 @@ public class LivePainelActivity extends AppCompatActivity {
                             newBus.setRoute(ele.select("td").get(Constants.ROUTE).text());
                             newBus.setTime(ele.select("td").get(Constants.TIME).text());
                             newBus.setDestination(ele.select("td").get(Constants.DESTINATION).text());
+
 
                             buses.add(newBus);
                         }
@@ -160,7 +152,7 @@ public class LivePainelActivity extends AppCompatActivity {
 
             listBusesLive.setAdapter(new ListBusAdapter(result, mContext));
 
-            viewSwitcher.showNext();
+            //viewSwitcher.showNext();
 
             Timer t = new Timer();
             t.schedule(new TimerTask() {

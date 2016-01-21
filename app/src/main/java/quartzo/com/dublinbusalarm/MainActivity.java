@@ -26,7 +26,9 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
@@ -105,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setNegativeButton("Cancel", null);
                 builder.setView(R.layout.customdialogform);
 
+
                 builder.show();
             }
         });
@@ -150,9 +153,46 @@ public class MainActivity extends AppCompatActivity {
         List<Alarm> alarms = AlarmPersistence.readStoredAlarms(mContext);
 
         if(alarms != null) {
-            listAlarms.setAdapter(new ListAlarmsAdapter(mContext, alarms));
+            listAlarms.setAdapter(new ListAlarmsAdapter(mContext, alarms, evtSwitcherAlarm));
         }
     }
+
+    private View.OnClickListener evtSwitcherAlarm = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            //Dialog f = (Dialog) dialog;
+
+            //txtBusStop = (TextView) f.findViewById(R.id.editTextBusStop);
+
+            //txtBusNumber = (TextView) f.findViewById(R.id.editTextBusNumber);
+            Switch swt = (Switch) v;
+
+            if(swt.isChecked()) {
+                Alarm alarm = (Alarm) v.getTag();
+
+                new LastBusAsync().execute(alarm.getBusStop(), alarm.getBus());
+            }else{
+                AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+
+                //Alarm alarm =  alarms.get(taggedPosition);
+                Alarm alarm = (Alarm) v.getTag();
+
+                Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
+
+                manager.cancel(PendingIntent.getBroadcast(mContext, alarm.getId(), alarmIntent, PendingIntent.FLAG_ONE_SHOT));
+
+                alarm.setIsActive(false);
+
+                AlarmPersistence.saveAlarm(alarm, mContext);
+
+                Toast toast = Toast.makeText(mContext, "Deleted " + alarm.toString(), Toast.LENGTH_SHORT);
+                toast.show();
+
+                //updateListViewAlarms();
+            }
+        }
+    };
 
     private AdapterView.OnClickListener evtClickBus = new AdapterView.OnClickListener() {
 
@@ -167,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog.Builder builder =
                     new AlertDialog.Builder(mContext, R.style.AppCompatAlertDialogStyle);
 
-            builder.setTitle("Pick a time");
+            builder.setTitle("Set alert options");
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -189,8 +229,8 @@ public class MainActivity extends AppCompatActivity {
                     //TODO Check it out another way to control the id
                     int alarmId = LocalTime.now().getMillisOfDay();
 
-                    Alarm myData = new Alarm(alarmId ,date.toString(), txtBusNumber.getText().toString(), txtBusStop.getText().toString(), String.valueOf(number.getValue()));
-
+                    //Alarm myData = new Alarm(alarmId ,date.toString(), txtBusNumber.getText().toString(), txtBusStop.getText().toString(), String.valueOf(number.getValue()), true);
+                    Alarm myData = new Alarm(alarmId ,date.toString(), txtBusNumber.getText().toString(), txtBusStop.getText().toString(), String.valueOf(number.getValue()), true);
                     Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
 
                     alarmIntent.putExtra("myDataSerialized", myData.serialize());
@@ -273,8 +313,9 @@ public class MainActivity extends AppCompatActivity {
             try {
 
                 // Connect to the web site
-                Document document = Jsoup.connect("http://www.dublinbus.ie/en/RTPI/Sources-of-Real-Time-Information/?searchtype=view&searchquery=" + params[0]).get();
-                //Document document = Jsoup.connect("https://s3.amazonaws.com/othersdev/DUBLIN_BUS.HTML").get();
+                Document document = Jsoup.connect(Constants.URL_DUBLIN_BUS + params[0]).get();
+                //Document document = Jsoup.connect(Constants.URL_DUBLIN_BUS).get();
+
 
                 // Get the html document title
                 Iterator<Element> table = document.select("table[id=rtpi-results]").select("tr:contains(" + params[1] + " )").iterator();
@@ -295,6 +336,7 @@ public class MainActivity extends AppCompatActivity {
                             newBus.setTime(ele.select("td").get(Constants.TIME).text());
                             newBus.setRoute(ele.select("td").get(Constants.ROUTE).text());
                             newBus.setDestination(ele.select("td").get(Constants.DESTINATION).text());
+
 
                             buses.add(newBus);
                         }

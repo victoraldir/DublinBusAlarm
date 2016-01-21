@@ -29,7 +29,12 @@ public class AlarmPersistence {
             alarms = new ArrayList<Alarm>();
         }
 
-        alarms.add(alarm);
+        if(alarms.contains(alarm)){
+            alarms.set(alarms.indexOf(alarm), alarm);
+        }else{
+            alarms.add(alarm);
+        }
+
 
         String serializedData = gson.toJson(alarms);
 
