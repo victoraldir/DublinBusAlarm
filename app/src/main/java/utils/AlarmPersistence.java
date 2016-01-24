@@ -75,13 +75,19 @@ public class AlarmPersistence {
 
     public static List<Alarm> readStoredAlarms(Context ctx) {
 
+        List<Alarm> alarms = new ArrayList<>();
+
         SharedPreferences preferencesReader = ctx.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE);
 
         // Read the shared preference value
         String serializedDataFromPreference = preferencesReader.getString(Constants.PREFS_KEY, null);
 
         // Create a new object from the serialized data with the same state
-        List<Alarm> alarms = gson.fromJson(serializedDataFromPreference, new TypeToken<List<Alarm>>(){}.getType());
+        List alarmsDb = gson.fromJson(serializedDataFromPreference, new TypeToken<List<Alarm>>(){}.getType());
+
+        if(alarmsDb != null){
+            alarms.addAll(alarmsDb);
+        }
 
         //List<Alarm> alarms = new ArrayList<Alarm>();
 

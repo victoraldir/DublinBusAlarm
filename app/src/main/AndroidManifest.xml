@@ -32,7 +32,8 @@
         <activity
             android:name=".LivePainelActivity"
             android:label="@string/title_activity_live_painel"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".MainActivity"></activity>
     </application>
 
 </manifest>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DublinBusAlarm</string>
+    <string name="app_name">myAlarm Bus</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_live_painel">LivePainelActivity</string>
 </resources>

@@ -3,42 +3,72 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Due"
-        android:textSize="50dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="15dp"
-        android:id="@+id/textViewMinutes" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="100dp"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout2"
+        android:gravity="center_horizontal|center_vertical"
+        >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Dublin Airport via O&apos;Connell Street"
-        android:id="@+id/textViewDestination"
-        android:layout_alignBottom="@+id/textViewMinutes"
-        android:layout_alignStart="@+id/textViewRoute" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Due"
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Route 40d"
-        android:id="@+id/textViewRoute"
-        android:layout_alignTop="@+id/textViewMinutes"
-        android:layout_toEndOf="@+id/textViewMinutes"
-        android:layout_marginStart="25dp" />
+            android:textSize="25dp"
+            android:id="@+id/textViewMinutes"
+            android:layout_below="@+id/linearLayout2"
+            android:layout_alignStart="@+id/textViewRoute" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="Min"
-        android:layout_marginLeft="20dp"
-        android:id="@+id/textView2"
-        android:layout_below="@+id/textViewMinutes"
-        android:layout_alignStart="@+id/textViewMinutes" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Min"
+
+            android:id="@+id/textView2"
+            android:layout_below="@+id/textViewMinutes"
+            android:layout_alignStart="@+id/textViewMinutes" />
+    </LinearLayout>
+
+
+
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="100dp"
+        android:layout_height="500dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignBottom="@+id/linearLayout2"
+        android:gravity="left|center_vertical"
+        android:layout_toEndOf="@+id/linearLayout2">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Route 40d"
+            android:id="@+id/textViewRoute"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Dublin Airport via O&apos;Connell Street"
+            android:id="@+id/textViewDestination"
+            android:layout_below="@+id/textViewRoute"
+            android:layout_alignStart="@+id/textViewRoute" />
+
+    </LinearLayout>
+
+
 </RelativeLayout>

@@ -30,14 +30,14 @@
             android:text="Vibrate"
             android:id="@+id/checkBoxVibrate"
             android:layout_gravity="center_horizontal"
-            android:checked="false" />
+            android:checked="true" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Audible Alert"
             android:id="@+id/checkBoxSound"
-            android:checked="false" />
+            android:checked="true" />
 
     </LinearLayout>
 

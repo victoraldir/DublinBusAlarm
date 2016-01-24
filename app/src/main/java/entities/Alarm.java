@@ -1,21 +1,28 @@
 package entities;
 
+import com.bignerdranch.expandablerecyclerview.Model.ParentListItem;
 import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by victor on 27/12/15.
  */
-public class Alarm {
+public class Alarm implements ParentListItem {
 
     private int id;
 
-    private String time;
+    //private String time;
 
     private String timeDue;
 
-    private String bus;
+    //private String bus;
 
-    private String busStop;
+    //private String busStop;
+
+    private Bus bus;
 
     private boolean isActive;
 
@@ -26,15 +33,16 @@ public class Alarm {
     public Alarm() {
     }
 
-    public Alarm(int id, String time, String bus, String busStop, String timeDue, boolean isActive, boolean isVibrate, boolean isSound) {
+    public Alarm(int id, Bus bus, String timeDue, boolean isActive, boolean isVibrate, boolean isSound) {
         this.id = id;
-        this.time = time;
-        this.bus = bus;
-        this.busStop = busStop;
+        //this.time = time;
+        //this.bus = bus;
+        //this.busStop = busStop;
         this.timeDue = timeDue;
         this.isActive = isActive;
         this.isVibrate = isVibrate;
         this.isSound = isSound;
+        this.bus = bus;
     }
 
     public String serialize() {
@@ -49,9 +57,9 @@ public class Alarm {
         return gson.fromJson(serializedData, Alarm.class);
     }
 
-    public String getTime() {
-        return time;
-    }
+//    public String getTime() {
+//        return time;
+//    }
 
     public int getId() {
         return id;
@@ -65,9 +73,9 @@ public class Alarm {
         return timeDue;
     }
 
-    public String getBus() {
-        return bus;
-    }
+//    public String getBus() {
+//        return bus;
+//    }
 
     public boolean isSound() {
         return isSound;
@@ -85,9 +93,9 @@ public class Alarm {
         this.isVibrate = isVibrate;
     }
 
-    public String getBusStop() {
-        return busStop;
-    }
+//    public String getBusStop() {
+//        return busStop;
+//    }
 
 
     public boolean isActive() {
@@ -98,14 +106,24 @@ public class Alarm {
         this.isActive = isActive;
     }
 
+    public void setTimeDue(String timeDue) {
+        this.timeDue = timeDue;
+    }
+
+    public Bus getBus() {
+        return bus;
+    }
+
+    public void setBus(Bus bus) {
+        this.bus = bus;
+    }
+
     @Override
     public String toString() {
         return "Alarm{" +
                 "id=" + id +
-                ", time='" + time + '\'' +
                 ", timeDue='" + timeDue + '\'' +
-                ", bus='" + bus + '\'' +
-                ", busStop='" + busStop + '\'' +
+                ", bus=" + bus +
                 ", isActive=" + isActive +
                 ", isVibrate=" + isVibrate +
                 ", isSound=" + isSound +
@@ -120,20 +138,29 @@ public class Alarm {
         Alarm alarm = (Alarm) o;
 
         if (id != alarm.id) return false;
-        if (!time.equals(alarm.time)) return false;
         if (!timeDue.equals(alarm.timeDue)) return false;
-        if (!bus.equals(alarm.bus)) return false;
-        return busStop.equals(alarm.busStop);
+        return bus.equals(alarm.bus);
 
     }
 
     @Override
     public int hashCode() {
         int result = id;
-        result = 31 * result + time.hashCode();
         result = 31 * result + timeDue.hashCode();
         result = 31 * result + bus.hashCode();
-        result = 31 * result + busStop.hashCode();
         return result;
+    }
+
+    @Override
+    public List<?> getChildItemList() {
+        List list = new ArrayList<Alarm>();
+        list.add(this);
+        //list.add(new Object());
+        return list;
+    }
+
+    @Override
+    public boolean isInitiallyExpanded() {
+        return false;
     }
 }

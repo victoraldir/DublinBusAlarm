@@ -23,6 +23,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import adapters.ListBusAdapter;
+import decorator.SimpleDividerItemDecoration;
 import entities.Alarm;
 import entities.Bus;
 import entities.Constants;
@@ -59,8 +60,9 @@ public class LivePainelActivity extends AppCompatActivity {
 
         //viewSwitcher = (ViewSwitcher) findViewById(R.id.viewswitcher);
 
-        getSupportActionBar().setTitle("Bus stop " + myData.getBusStop());
+        getSupportActionBar().setTitle("Bus stop " + myData.getBus().getStop());
         getSupportActionBar().setSubtitle("Real time");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mContext = this;
 
@@ -70,6 +72,8 @@ public class LivePainelActivity extends AppCompatActivity {
         listBusesLive = (RecyclerView) findViewById(R.id.listViewBusLive);
 
         listBusesLive.setLayoutManager(layoutManager);
+
+        listBusesLive.addItemDecoration(new SimpleDividerItemDecoration(this));
 
         slide_in_left = AnimationUtils.loadAnimation(this,
                 android.R.anim.fade_in);
@@ -81,7 +85,7 @@ public class LivePainelActivity extends AppCompatActivity {
 
         isFirsLoad = true;
 
-        new LastBusAsync().execute(myData.getBusStop());
+        new LastBusAsync().execute(myData.getBus().getStop());
 
     }
 
@@ -145,8 +149,9 @@ public class LivePainelActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<Bus> result) {
 
-            listBusesLive.setAdapter(new ListBusAdapter(result, mContext));
-
+            if(!result.isEmpty()) {
+                listBusesLive.setAdapter(new ListBusAdapter(result, mContext));
+            }
             //viewSwitcher.showNext();
 
             Timer t = new Timer();
@@ -155,7 +160,7 @@ public class LivePainelActivity extends AppCompatActivity {
                 @Override
                 public void run() {                   //timer
 
-                    new LastBusAsync().execute(myData.getBusStop());
+                    new LastBusAsync().execute(myData.getBus().getStop());
 
                 }
             }, 5000L);

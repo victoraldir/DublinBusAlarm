@@ -29,6 +29,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
+import com.yqritc.recyclerviewflexibledivider.HorizontalDividerItemDecoration;
+
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 import org.jsoup.Jsoup;
@@ -40,14 +43,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import adapters.AlarmExpandableAdapter;
 import adapters.ListAlarmsAdapter;
 import adapters.ListBusAdapter;
+import decorator.SimpleDividerItemDecoration;
 import entities.Alarm;
 import entities.Bus;
 import utils.AlarmPersistence;
 import entities.Constants;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ExpandableRecyclerAdapter.ExpandCollapseListener {
 
     ProgressDialog mProgressDialog;
     private Context mContext;
@@ -65,6 +70,12 @@ public class MainActivity extends AppCompatActivity {
     private LocalTime timeBus;
 
     private Alarm alarmChosenSwitch;
+
+    private Switch switchCurr;
+
+    private AlarmExpandableAdapter alarmExpandableAdapter;
+
+    private List<Alarm> alarms;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,7 +142,16 @@ public class MainActivity extends AppCompatActivity {
 
         listAlarms.setHasFixedSize(true);
 
+        listAlarms.addItemDecoration(new SimpleDividerItemDecoration(this));
+
         listBuses.setHasFixedSize(true);
+
+        listBuses.addItemDecoration(new SimpleDividerItemDecoration(this));
+
+        alarms = AlarmPersistence.readStoredAlarms(mContext);
+        alarmExpandableAdapter = new AlarmExpandableAdapter(mContext, alarms, evtSwitcherAlarm, evtDelete);
+        alarmExpandableAdapter.setExpandCollapseListener(this);
+        listAlarms.setAdapter(alarmExpandableAdapter);
 
         updateListViewAlarms();
 
@@ -142,7 +162,13 @@ public class MainActivity extends AppCompatActivity {
 
         builderListDialog.setTitle("Pick a bus");
 
-        builderListDialog.setNegativeButton("Cancel", null);
+        builderListDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(switchCurr != null)
+                switchCurr.setChecked(false);
+            }
+        });
 
         listDialog = builderListDialog.create();
 
@@ -151,32 +177,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateListViewAlarms(){
 
-        List<Alarm> alarms = AlarmPersistence.readStoredAlarms(mContext);
 
-        if(alarms != null) {
-            listAlarms.setAdapter(new ListAlarmsAdapter(mContext, alarms, evtSwitcherAlarm));
+        if (!alarms.isEmpty()) {
+            listAlarms.setVisibility(View.VISIBLE);
+
+        }else{
+            listAlarms.setVisibility(View.GONE);
         }
+
     }
 
     private View.OnClickListener evtSwitcherAlarm = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
-            //Dialog f = (Dialog) dialog;
-
-            //txtBusStop = (TextView) f.findViewById(R.id.editTextBusStop);
-
-            //txtBusNumber = (TextView) f.findViewById(R.id.editTextBusNumber);
             Switch swt = (Switch) v;
 
             if(swt.isChecked()) {
                 Alarm alarm = (Alarm) v.getTag();
                 alarmChosenSwitch = alarm;
-                new LastBusAsync().execute(alarm.getBusStop(), alarm.getBus());
+                switchCurr = swt;
+
+                new LastBusAsync().execute(alarm.getBus().getStop(), alarm.getBus().getRoute());
             }else{
                 AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
-                //Alarm alarm =  alarms.get(taggedPosition);
                 Alarm alarm = (Alarm) v.getTag();
 
                 Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
@@ -192,6 +217,38 @@ public class MainActivity extends AppCompatActivity {
 
                 //updateListViewAlarms();
             }
+        }
+    };
+
+    private View.OnClickListener evtDelete = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            //Integer taggedPosition = (Integer) v.getTag();
+
+            AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+
+            //Alarm alarm =  alarms.get(taggedPosition);
+            Alarm alarm = (Alarm) v.getTag();
+
+            Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
+
+            manager.cancel(PendingIntent.getBroadcast(mContext, alarm.getId(), alarmIntent, PendingIntent.FLAG_ONE_SHOT));
+
+            AlarmPersistence.deleteAlarm(alarm, mContext);
+
+            int position = alarms.indexOf(alarm);
+
+            alarms.remove(alarm);
+
+            Toast toast = Toast.makeText(mContext, "Deleted " + alarm.toString(), Toast.LENGTH_SHORT);
+            toast.show();
+
+            alarmExpandableAdapter.notifyParentItemRemoved(position);
+
+            if(alarms.isEmpty()){
+                updateListViewAlarms();
+            }
+
         }
     };
 
@@ -211,11 +268,6 @@ public class MainActivity extends AppCompatActivity {
 
             AlertDialog.Builder builder =
                     new AlertDialog.Builder(mContext, R.style.AppCompatAlertDialogStyle);
-
-            CheckBox checkBoxVibrate = (CheckBox) v.findViewById(R.id.checkBoxVibrate);
-
-            CheckBox checkBoxSound = (CheckBox) v.findViewById(R.id.checkBoxSound);
-
 
             builder.setTitle("Set alert options");
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -252,8 +304,7 @@ public class MainActivity extends AppCompatActivity {
                         myData.setIsActive(true);
 
                     } else{
-                        myData = new Alarm(alarmId, date.toString(), txtBusNumber.getText().toString(),
-                                txtBusStop.getText().toString(), String.valueOf(number.getValue()),
+                        myData = new Alarm(alarmId, bus, String.valueOf(number.getValue()),
                                 true, checkBoxVibrate.isChecked(), checkBoxSound.isChecked());
 
                     }
@@ -268,23 +319,32 @@ public class MainActivity extends AppCompatActivity {
 
                     AlarmPersistence.saveAlarm(myData, mContext);
 
+                    if(!alarms.contains(myData)) {
+                        alarms.add(myData);
+                        if (alarms.size() == 1) {
+                            alarmExpandableAdapter.notifyDataSetChanged();
+                            alarmExpandableAdapter.notifyParentItemInserted(alarms.size() - 1);
+                        } else {
+                            alarmExpandableAdapter.notifyParentItemInserted(alarms.size() - 1);
+                        }
+                    }else{
+                        int position = alarms.indexOf(myData);
+                        alarmExpandableAdapter.notifyParentItemChanged(position);
+                    }
+
                     updateListViewAlarms();
+
 
                 }
             });
 
-            if (txtBusNumber == null) {
-
-                checkBoxSound.setSelected(alarmChosenSwitch.isSound());
-                checkBoxVibrate.setSelected(alarmChosenSwitch.isVibrate());
-
-            } else{
-
-                checkBoxSound.setSelected(true);
-                checkBoxVibrate.setSelected(true);
-            }
-
-            builder.setNegativeButton("Cancel", null);
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if(switchCurr != null)
+                    switchCurr.setChecked(false);
+                }
+            });
 
 
 
@@ -330,6 +390,32 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onListItemExpanded(int position) {
+
+        //alarmExpandableAdapter.notifyParentItemChanged(position);
+        //alarmExpandableAdapter.expandParent(position);
+        //alarmExpandableAdapter.expandParent(alarm);
+        //alarmExpandableAdapter.onParentListItemExpanded(position);
+        //alarmExpandableAdapter.notifyDataSetChanged();
+
+        //alarmExpandableAdapter.notifyChildItemChanged(position,position);
+
+        //alarmExpandableAdapter.notify();
+        //String toastMsg = alarm.toString();
+        alarmExpandableAdapter.collapseAllParents();
+        alarmExpandableAdapter.expandParent(position);
+
+    }
+
+    @Override
+    public void onListItemCollapsed(int position) {
+
+        alarmExpandableAdapter.collapseParent(position);
+        //alarmExpandableAdapter.notifyParentItemChanged(position);
+        //alarmExpandableAdapter.notify();
+    }
+
     public class LastBusAsync extends AsyncTask<String, List<Bus>, List<Bus>> {
 
         @Override
@@ -373,7 +459,7 @@ public class MainActivity extends AppCompatActivity {
                             newBus.setTime(ele.select("td").get(Constants.TIME).text());
                             newBus.setRoute(ele.select("td").get(Constants.ROUTE).text());
                             newBus.setDestination(ele.select("td").get(Constants.DESTINATION).text());
-
+                            newBus.setStop(params[0]);
 
                             buses.add(newBus);
                         }

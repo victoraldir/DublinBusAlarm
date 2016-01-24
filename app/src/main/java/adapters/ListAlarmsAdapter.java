@@ -1,23 +1,25 @@
 package adapters;
 
+import android.annotation.SuppressLint;
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.view.animation.RotateAnimation;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bignerdranch.expandablerecyclerview.ViewHolder.ChildViewHolder;
+import com.bignerdranch.expandablerecyclerview.ViewHolder.ParentViewHolder;
 
 import java.util.List;
 
@@ -29,7 +31,7 @@ import utils.AlarmPersistence;
 /**
  * Created by victor on 28/12/15.
  */
-public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.AlarmViewHolder> {
+public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.AlarmParentViewHolder> {
 
     Context mContext;
     List<Alarm> alarms;
@@ -83,23 +85,23 @@ public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.Al
     };
 
     @Override
-    public AlarmViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.layout_list_alarms_adapter, parent, false);
+    public AlarmParentViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.layout_list_alarms_adapter_parent, parent, false);
 
-        return new AlarmViewHolder(view);
+        return new AlarmParentViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(AlarmViewHolder holder, int position) {
+    public void onBindViewHolder(AlarmParentViewHolder holder, int position) {
 
         Alarm alarm = alarms.get(position);
 
-        holder.txtStopNumber.setText("Bus stop " + alarm.getBusStop());
-        holder.txtBusNumber.setText("Bus number " + alarm.getBus());
-        holder.txtTimeNotif.setText("ID Alarm is.. " + alarm.getId());
+        holder.txtStopNumber.setText(alarm.getBus().getStop());
+        holder.txtBusNumber.setText("Route " + alarm.getBus().getRoute());
+        holder.txtTimeNotif.setText(alarm.getBus().getDestination());
 
-        holder.btnDelete.setOnClickListener(evtDelete);
-        holder.btnDelete.setTag(alarm);
+//        holder.btnDelete.setOnClickListener(evtDelete);
+//        holder.btnDelete.setTag(alarm);
 
         holder.itemView.setOnClickListener(evtClickAlarm);
 
@@ -121,15 +123,20 @@ public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.Al
         return alarms.size();
     }
 
-    public static class AlarmViewHolder extends RecyclerView.ViewHolder {
+    public static class AlarmParentViewHolder extends ParentViewHolder {
+
+        private static final float INITIAL_POSITION = 0.0f;
+        private static final float ROTATED_POSITION = 180f;
 
         public TextView txtBusNumber;
         public TextView txtStopNumber;
         public TextView txtTimeNotif;
-        public ImageView btnDelete;
-        public Switch switchAlarm;
 
-        public AlarmViewHolder(View v) {
+        public Switch switchAlarm;
+        public ImageButton mArrowExpandImageView;
+
+
+        public AlarmParentViewHolder(View v) {
             super(v);
 
             txtBusNumber = (TextView) v.findViewById(R.id.textViewBusNumber);
@@ -138,10 +145,78 @@ public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.Al
 
             txtTimeNotif = (TextView) v.findViewById(R.id.textViewTimeNotification);
 
-            btnDelete = (ImageView) v.findViewById(R.id.imageViewDelete);
-
             switchAlarm = (Switch) v.findViewById(R.id.seekBarAlarm);
 
+            mArrowExpandImageView = (ImageButton) v.findViewById(R.id.arrow_expand_imageview);
+
+            mArrowExpandImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (isExpanded()) {
+                        collapseView();
+                    } else {
+                        expandView();
+                    }
+
+                }
+            });
+
+        }
+
+        @Override
+        public boolean shouldItemViewClickToggleExpansion() {
+            return false;
+        }
+
+        @Override
+        public void setExpanded(boolean expanded) {
+            super.setExpanded(expanded);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                if (expanded) {
+                    mArrowExpandImageView.setRotation(ROTATED_POSITION);
+                } else {
+                    mArrowExpandImageView.setRotation(INITIAL_POSITION);
+                }
+            }
+        }
+
+        @Override
+        public void onExpansionToggled(boolean expanded) {
+            super.onExpansionToggled(expanded);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                RotateAnimation rotateAnimation;
+                if (expanded) { // rotate clockwise
+                    rotateAnimation = new RotateAnimation(ROTATED_POSITION,
+                            INITIAL_POSITION,
+                            RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+                            RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+                } else { // rotate counterclockwise
+                    rotateAnimation = new RotateAnimation(-1 * ROTATED_POSITION,
+                            INITIAL_POSITION,
+                            RotateAnimation.RELATIVE_TO_SELF, 0.5f,
+                            RotateAnimation.RELATIVE_TO_SELF, 0.5f);
+                }
+
+                rotateAnimation.setDuration(200);
+                rotateAnimation.setFillAfter(true);
+                mArrowExpandImageView.startAnimation(rotateAnimation);
+            }
+        }
+    }
+
+    public static class AlarmChildViewHolder extends ChildViewHolder {
+
+        public CheckBox hasSoundTextBoxt;
+        public CheckBox hasVibrationCheckBox;
+        public ImageButton btnDelete;
+
+
+        public AlarmChildViewHolder(View itemView) {
+            super(itemView);
+
+            hasSoundTextBoxt = (CheckBox) itemView.findViewById(R.id.checkBoxSound);
+            hasVibrationCheckBox = (CheckBox) itemView.findViewById(R.id.checkBoxVibrate);
+            btnDelete = (ImageButton) itemView.findViewById(R.id.imageViewDelete);
         }
     }
 }

@@ -45,7 +45,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.notification)
                         .setContentTitle("Bus " + myData.getBus() + " is due in " + myData.getTimeDue() + " min")
-                        .setContentText("See more details bus stop " + myData.getBusStop())
+                        .setContentText("See more details bus stop " + myData.getBus().getStop())
                         .setContentIntent(resultPendingIntent);
 
         if(myData.isVibrate()){

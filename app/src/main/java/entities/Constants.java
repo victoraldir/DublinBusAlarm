@@ -18,5 +18,4 @@ public class Constants {
     //public static final String URL_DUBLIN_BUS = "https://s3.amazonaws.com/othersdev/DUBLIN_BUS.HTML";
     public static final String URL_DUBLIN_BUS = "http://www.dublinbus.ie/en/RTPI/Sources-of-Real-Time-Information/?searchtype=view&searchquery=";
 
-
 }
