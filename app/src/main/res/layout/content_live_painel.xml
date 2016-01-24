@@ -7,6 +7,7 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="quartzo.com.dublinbusalarm.LivePainelActivity"
     >
+
     <android.support.v7.widget.RecyclerView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,4 +17,30 @@
         android:layout_centerHorizontal="true">
 
     </android.support.v7.widget.RecyclerView>
+
+
+    <LinearLayout
+        android:id="@+id/layoutNoBus"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical|clip_horizontal">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBarListBus"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No buses have been found. =("
+            android:id="@+id/txtNoData"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:visibility="gone"
+            android:layout_gravity="center_horizontal"/>
+
+    </LinearLayout>
 </LinearLayout>

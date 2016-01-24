@@ -154,7 +154,7 @@ public class Alarm implements ParentListItem {
     @Override
     public List<?> getChildItemList() {
         List list = new ArrayList<Alarm>();
-        list.add(this);
+        list.add(new Alarm(id,bus,timeDue,isActive,isVibrate,isSound));
         //list.add(new Object());
         return list;
     }

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
@@ -30,14 +31,20 @@ public class AlarmExpandableAdapter extends ExpandableRecyclerAdapter<ListAlarms
     private View.OnClickListener evtSwitcherAlarm;
     private List<Alarm> parentAlarmList;
     private View.OnClickListener evtDelete;
+    private CompoundButton.OnCheckedChangeListener evtCheckSound;
+    private CompoundButton.OnCheckedChangeListener evtCheckVibrate;
 
-    public AlarmExpandableAdapter(Context mContext, List<Alarm> parentAlarmList, View.OnClickListener evtSwitcherAlarm, View.OnClickListener evtDelete) {
+    public AlarmExpandableAdapter(Context mContext, List<Alarm> parentAlarmList, View.OnClickListener evtSwitcherAlarm,
+                                  View.OnClickListener evtDelete, CompoundButton.OnCheckedChangeListener evtCheckSound,
+                                  CompoundButton.OnCheckedChangeListener evtCheckVibrate) {
         super(parentAlarmList);
         this.mInflator = LayoutInflater.from(mContext);
         this.mContext = mContext;
         this.evtSwitcherAlarm = evtSwitcherAlarm;
         this.parentAlarmList = parentAlarmList;
         this.evtDelete = evtDelete;
+        this.evtCheckSound = evtCheckSound;
+        this.evtCheckVibrate = evtCheckVibrate;
     }
 
     @Override
@@ -82,10 +89,13 @@ public class AlarmExpandableAdapter extends ExpandableRecyclerAdapter<ListAlarms
         childViewHolder.btnDelete.setOnClickListener(evtDelete);
         childViewHolder.btnDelete.setTag(alarm);
 
-        //TODO
-//        childViewHolder.hasSoundTextBoxt.setChecked(alarm.isSound());
-//        childViewHolder.hasVibrationCheckBox.setChecked(alarm.isVibrate());
+        childViewHolder.hasSoundTextBoxt.setChecked(alarm.isSound());
+        childViewHolder.hasSoundTextBoxt.setTag(alarm);
+        childViewHolder.hasSoundTextBoxt.setOnCheckedChangeListener(evtCheckSound);
 
+        childViewHolder.hasVibrationCheckBox.setChecked(alarm.isVibrate());
+        childViewHolder.hasVibrationCheckBox.setTag(alarm);
+        childViewHolder.hasVibrationCheckBox.setOnCheckedChangeListener(evtCheckVibrate);
     }
 
 

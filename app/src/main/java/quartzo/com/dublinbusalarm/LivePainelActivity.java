@@ -8,8 +8,12 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -45,6 +49,12 @@ public class LivePainelActivity extends AppCompatActivity {
     boolean isFirsLoad;
     //ProgressDialog mProgressDialog;
 
+    LinearLayout layout;
+
+    private ProgressBar progressBar;
+
+    private TextView txtNoData;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,19 +76,26 @@ public class LivePainelActivity extends AppCompatActivity {
 
         mContext = this;
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
-        layoutManager.setOrientation(GridLayoutManager.VERTICAL);
+        progressBar = (ProgressBar) findViewById(R.id.progressBarListBus);
+
+        txtNoData = (TextView) findViewById(R.id.txtNoData);
 
         listBusesLive = (RecyclerView) findViewById(R.id.listViewBusLive);
 
-        listBusesLive.setLayoutManager(layoutManager);
+        listBusesLive.setLayoutManager(new LinearLayoutManager(mContext));
 
         listBusesLive.addItemDecoration(new SimpleDividerItemDecoration(this));
+
+        listBusesLive.setVisibility(View.GONE);
 
         slide_in_left = AnimationUtils.loadAnimation(this,
                 android.R.anim.fade_in);
         slide_out_right = AnimationUtils.loadAnimation(this,
                 android.R.anim.fade_out);
+
+        layout = (LinearLayout) findViewById(R.id.layoutNoBus);
+
+
 
         //viewSwitcher.setInAnimation(slide_in_left);
         //viewSwitcher.setOutAnimation(slide_out_right);
@@ -150,7 +167,12 @@ public class LivePainelActivity extends AppCompatActivity {
         protected void onPostExecute(List<Bus> result) {
 
             if(!result.isEmpty()) {
+                layout.setVisibility(View.GONE);
                 listBusesLive.setAdapter(new ListBusAdapter(result, mContext));
+                listBusesLive.setVisibility(View.VISIBLE);
+            }else{
+                progressBar.setVisibility(View.GONE);
+                txtNoData.setVisibility(View.VISIBLE);
             }
             //viewSwitcher.showNext();
 

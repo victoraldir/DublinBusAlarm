@@ -214,8 +214,8 @@ public class ListAlarmsAdapter extends RecyclerView.Adapter<ListAlarmsAdapter.Al
         public AlarmChildViewHolder(View itemView) {
             super(itemView);
 
-            hasSoundTextBoxt = (CheckBox) itemView.findViewById(R.id.checkBoxSound);
-            hasVibrationCheckBox = (CheckBox) itemView.findViewById(R.id.checkBoxVibrate);
+            hasSoundTextBoxt = (CheckBox) itemView.findViewById(R.id.checkBoxHasSound);
+            hasVibrationCheckBox = (CheckBox) itemView.findViewById(R.id.checkBoxHasVibration);
             btnDelete = (ImageButton) itemView.findViewById(R.id.imageViewDelete);
         }
     }
