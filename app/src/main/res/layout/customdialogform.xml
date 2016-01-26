@@ -9,7 +9,7 @@
         android:id="@+id/busStopdWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Bus number (optional)">
+        android:hint="Bus stop">
 
         <EditText
             android:id="@+id/editTextBusStop"
@@ -28,7 +28,7 @@
         android:id="@+id/busNumberWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Bus number">
+        android:hint="Bus number (optional)">
 
         <EditText
             android:id="@+id/editTextBusNumber"
