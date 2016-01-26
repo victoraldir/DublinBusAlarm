@@ -15,6 +15,9 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -54,6 +57,8 @@ public class LivePainelActivity extends AppCompatActivity {
     private ProgressBar progressBar;
 
     private TextView txtNoData;
+
+    private Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +109,16 @@ public class LivePainelActivity extends AppCompatActivity {
 
         new LastBusAsync().execute(myData.getBus().getStop());
 
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mTracker.setScreenName("Image~" + LivePainelActivity.class);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     public class LastBusAsync extends AsyncTask<String, List<Bus>, List<Bus>> {

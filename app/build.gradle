@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 23
@@ -22,13 +23,14 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+
     compile 'com.android.support:design:23.1.1'
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'net.danlew:android.joda:2.8.2'
     compile 'com.google.code.gson:gson:2.3.1'
-    compile 'com.android.support:recyclerview-v7:23.1.0'
-    compile 'com.android.support:appcompat-v7:23.0.+'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.yqritc:recyclerview-flexibledivider:1.2.8'
     compile 'com.bignerdranch.android:expandablerecyclerview:2.1.0'
-
+    compile 'com.google.android.gms:play-services-analytics:8.3.0'
 }

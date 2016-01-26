@@ -29,12 +29,13 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:id="@+id/imageView"
-            android:src="@drawable/ic_alarm_off_black_24dp" />
+            android:src="@drawable/alarm_empty"
+            android:textAppearance="?android:attr/imageWellStyle" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="No Alarms"
             android:id="@+id/textView4" />
 

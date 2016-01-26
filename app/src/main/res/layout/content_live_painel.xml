@@ -36,7 +36,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No buses have been found. =("
+            android:text="No buses have been found."
             android:id="@+id/txtNoData"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:visibility="gone"

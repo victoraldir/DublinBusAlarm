@@ -20,6 +20,7 @@ public class Constants {
 
     public static final int NO_CONNECTION = 0;
     public static final int NO_DATA_UNAVAILABLE = 1;
+    public static final int NO_DATA_UNAVAILABLE_SWITCHER = 2;
 
 
 }

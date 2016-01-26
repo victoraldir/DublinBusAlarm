@@ -31,6 +31,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
@@ -81,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
     private List<Alarm> alarms;
 
+    private Tracker mTracker;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,10 +92,6 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
-        //txttitle = (TextView) findViewById(R.id.txtLastBus);
-
 
 
         //txttitle.setText(readDataShared());
@@ -164,7 +164,15 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
         listDialog = builderListDialog.create();
 
+        AnalyticsApplication application = (AnalyticsApplication) getApplication();
+        mTracker = application.getDefaultTracker();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mTracker.setScreenName("Image~" + MainActivity.class);
+        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     private AlertDialog dialogFormBusNumberBusStop(){
@@ -281,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
                 break;
             case Constants.NO_DATA_UNAVAILABLE:
                 builder.setTitle("Ops! ");
-                builder.setMessage("Something went wrong =( No data has been found");
+                builder.setMessage("Something went wrong. No data has been found");
                 builder.setPositiveButton("New search", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -289,6 +297,17 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
                     }
                 });
                 builder.setNegativeButton("Cancel",null);
+                break;
+            case Constants.NO_DATA_UNAVAILABLE_SWITCHER:
+                builder.setTitle("Ops! ");
+                builder.setMessage("Something went wrong. No data has been found");
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if(switchCurr != null)
+                            switchCurr.setChecked(false);
+                    }
+                });
                 break;
         }
 
@@ -307,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
                     alarmChosenSwitch = alarm;
                     switchCurr = swt;
 
-                    new LastBusAsync().execute(alarm.getBus().getStop(), alarm.getBus().getRoute());
+                    new LastBusAsync().execute(alarm.getBus().getStop(), alarm.getBus().getRoute(),"isSwitcher");
                 }else{
                     warningNoConnection(Constants.NO_CONNECTION).show();
                     swt.setChecked(false);
@@ -325,8 +344,8 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
                 AlarmPersistence.saveAlarm(alarm, mContext);
 
-                Toast toast = Toast.makeText(mContext, "Deleted " + alarm.toString(), Toast.LENGTH_SHORT);
-                toast.show();
+//                Toast toast = Toast.makeText(mContext, "Deleted " + alarm.toString(), Toast.LENGTH_SHORT);
+//                toast.show();
 
                 //updateListViewAlarms();
             }
@@ -448,7 +467,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
                     date = date.plusMinutes(diff);
                     //date = date.plusSeconds(10);
-                    //TODO Check it out another way to control the id
+
                     int alarmId = LocalTime.now().getMillisOfDay();
 
                     //Alarm myData = new Alarm(alarmId ,date.toString(), txtBusNumber.getText().toString(), txtBusStop.getText().toString(), String.valueOf(number.getValue()), true);
@@ -585,6 +604,8 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
     public class LastBusAsync extends AsyncTask<String, List<Bus>, List<Bus>> {
 
+        boolean isSwitcher = false;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -597,6 +618,11 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
         @Override
         protected List<Bus> doInBackground(String... params) {
+
+            if(params.length > 2){
+                if(params[2] != null && params[2].equals("isSwitcher"))
+                    isSwitcher = true;
+            }
 
             List<Bus> buses = new ArrayList<>();
 
@@ -663,7 +689,11 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
                 listDialog.show();
 
             }else{
-                warningNoConnection(Constants.NO_DATA_UNAVAILABLE).show();
+                if(isSwitcher){
+                    warningNoConnection(Constants.NO_DATA_UNAVAILABLE_SWITCHER).show();
+                }else {
+                    warningNoConnection(Constants.NO_DATA_UNAVAILABLE).show();
+                }
             }
         }
     }
