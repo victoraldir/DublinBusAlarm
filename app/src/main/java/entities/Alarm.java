@@ -14,13 +14,7 @@ public class Alarm implements ParentListItem {
 
     private int id;
 
-    //private String time;
-
     private String timeDue;
-
-    //private String bus;
-
-    //private String busStop;
 
     private Bus bus;
 
@@ -30,14 +24,13 @@ public class Alarm implements ParentListItem {
 
     private boolean isSound;
 
+    private boolean isRepeat;
+
     public Alarm() {
     }
 
     public Alarm(int id, Bus bus, String timeDue, boolean isActive, boolean isVibrate, boolean isSound) {
         this.id = id;
-        //this.time = time;
-        //this.bus = bus;
-        //this.busStop = busStop;
         this.timeDue = timeDue;
         this.isActive = isActive;
         this.isVibrate = isVibrate;
@@ -57,10 +50,6 @@ public class Alarm implements ParentListItem {
         return gson.fromJson(serializedData, Alarm.class);
     }
 
-//    public String getTime() {
-//        return time;
-//    }
-
     public int getId() {
         return id;
     }
@@ -72,10 +61,6 @@ public class Alarm implements ParentListItem {
     public String getTimeDue() {
         return timeDue;
     }
-
-//    public String getBus() {
-//        return bus;
-//    }
 
     public boolean isSound() {
         return isSound;
@@ -93,11 +78,6 @@ public class Alarm implements ParentListItem {
         this.isVibrate = isVibrate;
     }
 
-//    public String getBusStop() {
-//        return busStop;
-//    }
-
-
     public boolean isActive() {
         return isActive;
     }
@@ -106,16 +86,8 @@ public class Alarm implements ParentListItem {
         this.isActive = isActive;
     }
 
-    public void setTimeDue(String timeDue) {
-        this.timeDue = timeDue;
-    }
-
     public Bus getBus() {
         return bus;
-    }
-
-    public void setBus(Bus bus) {
-        this.bus = bus;
     }
 
     @Override
@@ -155,7 +127,6 @@ public class Alarm implements ParentListItem {
     public List<?> getChildItemList() {
         List list = new ArrayList<Alarm>();
         list.add(new Alarm(id,bus,timeDue,isActive,isVibrate,isSound));
-        //list.add(new Object());
         return list;
     }
 
