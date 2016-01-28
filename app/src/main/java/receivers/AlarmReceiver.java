@@ -38,15 +38,18 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Alarm myData = Alarm.create(intent.getStringExtra("myDataSerialized"));
 
-        long[] pattern = {0, 100, 1000};
+        long[] pattern = {1000, 1000, 1000, 1000, 1000};
         Uri uri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.drawable.notification)
+                        .setCategory(Notification.CATEGORY_ALARM)
+                        .setSmallIcon(R.drawable.ic_notification)
                         .setContentTitle("Bus " + myData.getBus().getRoute() + " is due in " + myData.getTimeDue() + " min")
-                        .setContentText("Click to see real time information ")
-                        .setContentIntent(resultPendingIntent);
+                        .setContentText("Time to go to bus stop " + myData.getBus().getStop())
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        //.setContentIntent(resultPendingIntent);
+                        .addAction(android.R.drawable.ic_menu_view, "View details", resultPendingIntent);
 
         if(myData.isVibrate()){
             mBuilder.setVibrate(pattern);
