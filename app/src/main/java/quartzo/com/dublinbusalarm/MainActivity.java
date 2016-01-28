@@ -85,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
     private Tracker mTracker;
 
+    private RecyclerView.LayoutManager lmAlarms;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +124,9 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
         listBuses.setLayoutManager(new LinearLayoutManager(mContext));
 
-        listAlarms.setLayoutManager(new LinearLayoutManager(mContext));
+        lmAlarms = new LinearLayoutManager(mContext);
+
+        listAlarms.setLayoutManager(lmAlarms);
 
         listAlarms.setHasFixedSize(true);
 
@@ -147,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
         builderListDialog.setTitle("Pick a bus");
 
-        builderListDialog.setPositiveButton("New seach", new DialogInterface.OnClickListener() {
+        builderListDialog.setPositiveButton("New search", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialogFormBusNumberBusStop().show();
@@ -392,13 +396,17 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
                                 if (alarms.size() == 1) {
                                     alarmExpandableAdapter.notifyDataSetChanged();
                                     alarmExpandableAdapter.notifyParentItemInserted(position);
+                                    lmAlarms.scrollToPosition(position);
                                 } else {
                                     alarmExpandableAdapter.notifyParentItemInserted(position);
                                 }
                             } else {
                                 //int position = alarms.indexOf(alarm);
                                 alarmExpandableAdapter.notifyParentItemChanged(position);
+
                             }
+
+                            lmAlarms.scrollToPosition(position);
 
                             updateListViewAlarms();
                         }
@@ -496,15 +504,20 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
                     if (!alarms.contains(myData)) {
                         alarms.add(myData);
+
                         if (alarms.size() == 1) {
                             alarmExpandableAdapter.notifyDataSetChanged();
-                            alarmExpandableAdapter.notifyParentItemInserted(alarms.size() - 1);
-                        } else {
-                            alarmExpandableAdapter.notifyParentItemInserted(alarms.size() - 1);
                         }
+
+                        alarmExpandableAdapter.notifyParentItemInserted(alarms.size() - 1);
+                        alarmExpandableAdapter.expandParent(alarms.size() - 1);
+                        lmAlarms.scrollToPosition(alarms.size());
+
                     } else {
                         int position = alarms.indexOf(myData);
                         alarmExpandableAdapter.notifyParentItemChanged(position);
+                        //lmAlarms.scrollToPosition(position);
+
                     }
 
                     updateListViewAlarms();
@@ -652,7 +665,9 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
                         //String curr = ele.select("td").get(Constants.DESTINATION).text();
 
                         if (!ele.className().contains("yellow")) {
-                            if (!ele.select("td").get(Constants.TIME).text().equalsIgnoreCase("Due")) {
+                            if (!ele.select("td").get(Constants.TIME).text().equalsIgnoreCase("Due") &&
+                                    !ele.select("td").get(Constants.TIME).text().equalsIgnoreCase("0") &&
+                                    !ele.select("td").get(Constants.TIME).text().equalsIgnoreCase("1")) {
 
                                 Bus newBus = new Bus();
 
