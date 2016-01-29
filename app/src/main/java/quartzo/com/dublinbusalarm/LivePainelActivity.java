@@ -1,5 +1,6 @@
 package quartzo.com.dublinbusalarm;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -60,6 +61,8 @@ public class LivePainelActivity extends AppCompatActivity {
 
     private Tracker mTracker;
 
+    public static final String NOTIFICATION_ID = "NOTIFICATION_ID";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +72,12 @@ public class LivePainelActivity extends AppCompatActivity {
 
         myData = Alarm.create(getIntent().getStringExtra("myDataSerialized"));
 
+        int mNotificationId = getIntent().getIntExtra("mNotificationId",0);
+
+        if(mNotificationId != 0){
+            NotificationManager mNM = (NotificationManager) getSystemService(getApplicationContext().NOTIFICATION_SERVICE);
+            mNM.cancel(mNotificationId);
+        }
         //txtBusStop = (TextView) findViewById(R.id.textViewBusStop);
 
         //txtBusStop.setText(myData.getBusStop());

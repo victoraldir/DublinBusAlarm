@@ -510,7 +510,9 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
                         }
 
                         alarmExpandableAdapter.notifyParentItemInserted(alarms.size() - 1);
+                        alarmExpandableAdapter.collapseAllParents();
                         alarmExpandableAdapter.expandParent(alarms.size() - 1);
+
                         lmAlarms.scrollToPosition(alarms.size());
 
                     } else {
