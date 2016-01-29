@@ -36,6 +36,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         it.putExtra("myDataSerialized", intent.getStringExtra("myDataSerialized"));
 
+        it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         PendingIntent resultPendingIntent =
                 PendingIntent.getActivity(
                         context,
