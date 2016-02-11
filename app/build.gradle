@@ -33,4 +33,5 @@ dependencies {
     compile 'com.yqritc:recyclerview-flexibledivider:1.2.8'
     compile 'com.bignerdranch.android:expandablerecyclerview:2.1.0'
     compile 'com.google.android.gms:play-services-analytics:8.3.0'
+    compile 'com.github.clans:fab:1.6.2'
 }

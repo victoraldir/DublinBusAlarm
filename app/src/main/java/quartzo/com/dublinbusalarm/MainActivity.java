@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +29,7 @@ import android.widget.CompoundButton;
 import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
@@ -36,11 +38,13 @@ import com.google.android.gms.analytics.Tracker;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
+import org.joda.time.format.DateTimeFormatter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -71,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
     private TextInputLayout inputBusNumberLayout;
 
-    AlertDialog listDialog;
+    private AlertDialog listDialog;
 
     private LocalTime timeBus;
 
@@ -87,6 +91,15 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
     private RecyclerView.LayoutManager lmAlarms;
 
+    private TimePickerDialog mTimePickerDialog;
+
+    private boolean isScheduled;
+
+    private CheckBox checkBoxSound;
+
+    private LocalTime timePicked;
+
+    private CheckBox checkBoxVibrate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,17 +108,19 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        isScheduled = false;
         //txttitle.setText(readDataShared());
 
         mContext = this;
 
         //pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), 0, alarmIntent, 0);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        com.github.clans.fab.FloatingActionButton fab = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                isScheduled =false;
 
                 if (!UtilCheckConnectivity.isInternetAvailable(getSystemService(Context.CONNECTIVITY_SERVICE))) {
                     warningNoConnection(Constants.NO_CONNECTION).show();
@@ -116,9 +131,18 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
             }
         });
 
-        listBuses = new RecyclerView(mContext);
+        com.github.clans.fab.FloatingActionButton fabSchedule = (com.github.clans.fab.FloatingActionButton) findViewById(R.id.fab3);
 
-        //listBuses.setOnItemClickListener(evtClickBus);
+        fabSchedule.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isScheduled =true;
+                mTimePickerDialog = new TimePickerDialog(mContext,evtPickTime,LocalTime.now().getHourOfDay(),LocalTime.now().getMinuteOfHour(),true);
+                mTimePickerDialog.show();
+            }
+        });
+
+        listBuses = new RecyclerView(mContext);
 
         listAlarms = (RecyclerView) findViewById(R.id.listViewAlarms);
 
@@ -179,33 +203,216 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onListItemExpanded(int position) {
+
+        alarmExpandableAdapter.collapseAllParents();
+        alarmExpandableAdapter.expandParent(position);
+
+    }
+
+    @Override
+    public void onListItemCollapsed(int position) {
+
+        alarmExpandableAdapter.collapseParent(position);
+
+    }
+
+    //------------------------------------------------Private Methods ---------------------------
+
+    private void updateListViewAlarms() {
+
+
+        if (!alarms.isEmpty()) {
+            listAlarms.setVisibility(View.VISIBLE);
+
+        } else {
+            listAlarms.setVisibility(View.GONE);
+        }
+
+    }
+
+    private void saveAlarm(int minutes, Bus bus) {
+        AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+
+        DateTime date = new DateTime();
+
+        int alarmId = LocalTime.now().getMillisOfDay();
+
+        if (minutes != 0) {
+
+            LocalTime busTime = timeBus.minusHours(LocalTime.now().getHourOfDay()).minusMinutes(LocalTime.now().getMinuteOfHour()).minusSeconds(LocalTime.now().getSecondOfMinute());
+
+            int diff = busTime.getMinuteOfHour() - minutes;
+
+            date = date.plusMinutes(diff);
+        } else {
+
+            LocalTime timeChosen = LocalTime.now().withHourOfDay(timePicked.getHourOfDay()).
+                    withMinuteOfHour(timePicked.getMinuteOfHour()).withSecondOfMinute(0);
+
+            if (timeChosen.isBefore(LocalTime.now())) {
+                date = date.plusDays(1).withHourOfDay(timeChosen.getHourOfDay()).
+                        withMinuteOfHour(timeChosen.getMinuteOfHour()).withSecondOfMinute(0);
+            } else {
+                date = date.withHourOfDay(timeChosen.getHourOfDay()).withMinuteOfHour(timeChosen.getMinuteOfHour()).withSecondOfMinute(0);
+            }
+
+        }
+
+        Alarm myData;
+
+        if (txtBusNumber == null) {
+            myData = alarmChosenSwitch;
+            myData.setIsActive(true);
+
+        } else {
+            if (bus != null) {
+                myData = new Alarm(alarmId,0, bus, LocalTime.now().toString(Constants.TIME_MASK), "",
+                         true, checkBoxVibrate.isChecked(), checkBoxSound.isChecked(), false);
+            } else {
+
+                Bus newBus = new Bus();
+                newBus.setRoute(txtBusNumber.getText().toString());
+                newBus.setStop(txtBusStop.getText().toString());
+                newBus.setDestination("N/A");
+                newBus.setTime("00:00:00");
+
+                myData = new Alarm(alarmId, 0, newBus, LocalTime.now().toString(Constants.TIME_MASK) , "",
+                        true, checkBoxVibrate.isChecked(), checkBoxSound.isChecked(), true);
+            }
+
+        }
+
+        Intent alarmIntent;
+
+        if (!isScheduled) {
+
+            alarmIntent = new Intent("EXECUTE_ALARM_BUS");
+
+            alarmIntent.putExtra("myDataSerialized", myData.serialize());
+
+            PendingIntent appIntent = PendingIntent.getBroadcast(mContext, alarmId, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+
+            manager.set(AlarmManager.RTC_WAKEUP, date.getMillis(), appIntent);
+
+        } else {
+
+            alarmIntent = new Intent("EXECUTE_ALARM_BUS_SCHEDULE");
+
+            alarmIntent.putExtra("myDataSerialized", myData.serialize());
+
+            PendingIntent appIntent = PendingIntent.getBroadcast(mContext, alarmId, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+
+            manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, date.getMillis(), AlarmManager.INTERVAL_DAY, appIntent);
+        }
+
+        AlarmPersistence.saveAlarm(myData, mContext);
+
+        if (!alarms.contains(myData)) {
+            alarms.add(myData);
+
+            if (alarms.size() == 1) {
+                alarmExpandableAdapter.notifyDataSetChanged();
+            }
+
+            alarmExpandableAdapter.notifyParentItemInserted(alarms.size() - 1);
+            alarmExpandableAdapter.collapseAllParents();
+            alarmExpandableAdapter.expandParent(alarms.size() - 1);
+
+            lmAlarms.scrollToPosition(alarms.size());
+
+        } else {
+            int position = alarms.indexOf(myData);
+            alarmExpandableAdapter.notifyParentItemChanged(position);
+            //lmAlarms.scrollToPosition(position);
+
+        }
+
+        updateListViewAlarms();
+    }
+
+    private boolean validateData() {
+        boolean result = true;
+
+        String busStop = txtBusStop.getText().toString();
+        if (busStop == null || busStop.equals("0") || busStop.equals("")) {
+            // We set the error message
+            inputBusStopLayout.setError("You must to inform a valid bus stop");
+
+            if(isScheduled) {
+                String busNumber = txtBusStop.getText().toString();
+                if (busNumber == null || busNumber.equals("0") || busNumber.equals("")) {
+                    // We set the error message
+                    inputBusNumberLayout.setError("You must to inform a valid route");
+                    //result = false;
+                }
+            }
+
+            result = false;
+        }
+
+        if(isScheduled) {
+            String busNumber = txtBusStop.getText().toString();
+            if (busNumber == null || busNumber.equals("0") || busNumber.equals("")) {
+                // We set the error message
+                inputBusNumberLayout.setError("You must to inform a valid route");
+                result = false;
+            }
+        }
+
+
+        return result;
+    }
+
+    //----------------------------------------------AlertDialogs --------------------------------
+
     private AlertDialog dialogFormBusNumberBusStop(){
 
         AlertDialog.Builder builder =
                 new AlertDialog.Builder(mContext, R.style.AppCompatAlertDialogStyle);
-        builder.setTitle("Search a bus");
+
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
+                (Context.LAYOUT_INFLATER_SERVICE);
+        View v = inflater.inflate(R.layout.customdialogform, (ViewGroup) findViewById(android.R.id.content), false);
+
+        inputBusStopLayout = (TextInputLayout) v.findViewById(R.id.busStopdWrapper);
+        inputBusNumberLayout = (TextInputLayout) v.findViewById(R.id.busNumberWrapper);
+
+        inputBusStopLayout.setErrorEnabled(true);
+
+        inputBusStopLayout.setHint("Bus stop");
+
+
+        if(!isScheduled){
+            inputBusNumberLayout.setHint("Bus number (optional)");
+            builder.setTitle("Search a bus");
+        }else{
+            inputBusNumberLayout.setHint("Bus number");
+            inputBusNumberLayout.setErrorEnabled(true);
+            builder.setTitle("Inform a route and bus stop");
+        }
+
+
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                Dialog f = (Dialog) dialog;
-
-                txtBusStop = (TextView) f.findViewById(R.id.editTextBusStop);
-
-                txtBusNumber = (TextView) f.findViewById(R.id.editTextBusNumber);
-
-                inputBusStopLayout = (TextInputLayout) f.findViewById(R.id.busStopdWrapper);
-                inputBusNumberLayout = (TextInputLayout) f.findViewById(R.id.busNumberWrapper);
-
-                inputBusNumberLayout.setErrorEnabled(true);
-
-                if (validateData()) {
-                    new LastBusAsync().execute(txtBusStop.getText().toString(), txtBusNumber.getText().toString());
-                }
-
             }
-
-
         });
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
@@ -214,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
             }
         });
         builder.setNegativeButton("Cancel", null);
-        builder.setView(R.layout.customdialogform);
+        builder.setView(v);
 
         final AlertDialog f = builder.create();
 
@@ -236,8 +443,18 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
                         inputBusNumberLayout.setErrorEnabled(true);
 
+//                        if (validateData()) {
+//                            new LastBusAsync().execute(txtBusStop.getText().toString(), txtBusNumber.getText().toString());
+//                            f.dismiss();
+//                        }
+
                         if (validateData()) {
-                            new LastBusAsync().execute(txtBusStop.getText().toString(), txtBusNumber.getText().toString());
+                            if (!isScheduled) {
+                                new LastBusAsync().execute(txtBusStop.getText().toString(), txtBusNumber.getText().toString());
+                            } else {
+                                dialogPickIntervalAlarm(null).show();
+                                //saveAlarm(0, null);
+                            }
                             f.dismiss();
                         }
 
@@ -253,31 +470,69 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         return f;
     }
 
+    private AlertDialog dialogPickIntervalAlarm(final Bus bus){
 
-    private boolean validateData() {
-        boolean result = true;
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(mContext, R.style.AppCompatAlertDialogStyle);
 
-        String busStop = txtBusStop.getText().toString();
-        if (busStop == null || busStop.equals("0") || busStop.equals("")) {
-            // We set the error message
-            inputBusStopLayout.setError("You must to inform a valid bus stop");
-            result = false;
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
+                (Context.LAYOUT_INFLATER_SERVICE);
+        View v = inflater.inflate(R.layout.customdialogtimepicker, (ViewGroup) findViewById(android.R.id.content), false);
+
+        builder.setTitle("Set alert options");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                Dialog f = (Dialog) dialog;
+
+                NumberPicker number = (NumberPicker) f.findViewById(R.id.numberPicker2);
+
+                checkBoxVibrate = (CheckBox) f.findViewById(R.id.checkBoxVibrate);
+
+                checkBoxSound = (CheckBox) f.findViewById(R.id.checkBoxSound);
+                if(!isScheduled) {
+                    saveAlarm(number.getValue(), bus);
+                }else{
+                    saveAlarm(0, null);
+                }
+
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (switchCurr != null)
+                    switchCurr.setChecked(false);
+            }
+        });
+
+
+        NumberPicker time = (NumberPicker) v.findViewById(R.id.numberPicker2);
+        if(!isScheduled) {
+            timeBus = LocalTime.parse(bus.getTime());
+
+            LocalTime difference = timeBus.minusHours(LocalTime.now().getHourOfDay()).minusMinutes(LocalTime.now().getMinuteOfHour()).minusSeconds(LocalTime.now().getSecondOfMinute());
+
+            int val = difference.getMinuteOfHour();
+
+            time.setMinValue(1);
+            time.setMaxValue(val - 1);
+
+            time.setValue(val - 1);
+
+
+        }else{
+            time.setMinValue(1);
+            time.setMaxValue(15);
+
+            time.setValue(10);
         }
 
+        builder.setView(v);
 
-        return result;
-    }
-
-    private void updateListViewAlarms() {
-
-
-        if (!alarms.isEmpty()) {
-            listAlarms.setVisibility(View.VISIBLE);
-
-        } else {
-            listAlarms.setVisibility(View.GONE);
-        }
-
+        return builder.create();
     }
 
     private AlertDialog warningNoConnection(int cons) {
@@ -318,20 +573,39 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         return builder.create();
 
     }
+
+    //------------------------------------------------Events--------------------------------------
+
+    private TimePickerDialog.OnTimeSetListener evtPickTime = new TimePickerDialog.OnTimeSetListener() {
+        @Override
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            timePicked = LocalTime.now().withHourOfDay(hourOfDay).withMinuteOfHour(minute);
+
+            if (!UtilCheckConnectivity.isInternetAvailable(getSystemService(Context.CONNECTIVITY_SERVICE))) {
+                warningNoConnection(Constants.NO_CONNECTION).show();
+
+            }else{
+
+                dialogFormBusNumberBusStop().show();
+            }
+
+        }
+    };
+
     private View.OnClickListener evtSwitcherAlarm = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
 
             Switch swt = (Switch) v;
-
+            isScheduled = false;
             if (swt.isChecked()) {
-                if(UtilCheckConnectivity.isInternetAvailable(getSystemService(Context.CONNECTIVITY_SERVICE))) {
+                if (UtilCheckConnectivity.isInternetAvailable(getSystemService(Context.CONNECTIVITY_SERVICE))) {
                     Alarm alarm = (Alarm) v.getTag();
                     alarmChosenSwitch = alarm;
                     switchCurr = swt;
 
-                    new LastBusAsync().execute(alarm.getBus().getStop(), alarm.getBus().getRoute(),"isSwitcher");
-                }else{
+                    new LastBusAsync().execute(alarm.getBus().getStop(), alarm.getBus().getRoute(), "isSwitcher");
+                } else {
                     warningNoConnection(Constants.NO_CONNECTION).show();
                     swt.setChecked(false);
                 }
@@ -348,10 +622,6 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
                 AlarmPersistence.saveAlarm(alarm, mContext);
 
-//                Toast toast = Toast.makeText(mContext, "Deleted " + alarm.toString(), Toast.LENGTH_SHORT);
-//                toast.show();
-
-                //updateListViewAlarms();
             }
         }
     };
@@ -359,11 +629,9 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
     private View.OnClickListener evtDelete = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            //Integer taggedPosition = (Integer) v.getTag();
 
             AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
-            //Alarm alarm =  alarms.get(taggedPosition);
             final Alarm alarm = (Alarm) v.getTag();
 
             Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
@@ -375,9 +643,6 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
             final int position = alarms.indexOf(alarm);
 
             alarms.remove(alarm);
-
-//            Toast toast = Toast.makeText(mContext, "Deleted " + alarm.toString(), Toast.LENGTH_SHORT);
-//            toast.show();
 
             alarmExpandableAdapter.notifyParentItemRemoved(position);
 
@@ -392,7 +657,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
                             AlarmPersistence.saveAlarm(alarm, mContext);
 
                             if (!alarms.contains(alarm)) {
-                                alarms.add(position,alarm);
+                                alarms.add(position, alarm);
                                 if (alarms.size() == 1) {
                                     alarmExpandableAdapter.notifyDataSetChanged();
                                     alarmExpandableAdapter.notifyParentItemInserted(position);
@@ -422,7 +687,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             Alarm alarmTest = (Alarm) buttonView.getTag();
             alarmTest.setIsVibrate(isChecked);
-            AlarmPersistence.saveAlarm(alarmTest,mContext);
+            AlarmPersistence.saveAlarm(alarmTest, mContext);
         }
     };
 
@@ -431,7 +696,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             Alarm alarmTest = (Alarm) buttonView.getTag();
             alarmTest.setIsSound(isChecked);
-            AlarmPersistence.saveAlarm(alarmTest,mContext);
+            AlarmPersistence.saveAlarm(alarmTest, mContext);
         }
     };
 
@@ -440,182 +705,16 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         @Override
         public void onClick(final View view) {
 
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService
-                    (Context.LAYOUT_INFLATER_SERVICE);
-            View v = inflater.inflate(R.layout.customdialogtimepicker, (ViewGroup) view, false);
-
-//            Bus bus = (Bus) listBuses.getAdapter().getItem(position);
             final Bus bus = (Bus) view.getTag();
 
             listDialog.cancel();
 
-            AlertDialog.Builder builder =
-                    new AlertDialog.Builder(mContext, R.style.AppCompatAlertDialogStyle);
-
-            builder.setTitle("Set alert options");
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                    Dialog f = (Dialog) dialog;
-
-                    NumberPicker number = (NumberPicker) f.findViewById(R.id.numberPicker2);
-
-                    AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-
-                    CheckBox checkBoxVibrate = (CheckBox) f.findViewById(R.id.checkBoxVibrate);
-
-                    CheckBox checkBoxSound = (CheckBox) f.findViewById(R.id.checkBoxSound);
-
-                    DateTime date = new DateTime();
-
-                    LocalTime busTime = timeBus.minusHours(LocalTime.now().getHourOfDay()).minusMinutes(LocalTime.now().getMinuteOfHour()).minusSeconds(LocalTime.now().getSecondOfMinute());
-
-                    int diff = busTime.getMinuteOfHour() - number.getValue();
-
-                    date = date.plusMinutes(diff);
-                    //date = date.plusSeconds(10);
-
-                    int alarmId = LocalTime.now().getMillisOfDay();
-
-                    //Alarm myData = new Alarm(alarmId ,date.toString(), txtBusNumber.getText().toString(), txtBusStop.getText().toString(), String.valueOf(number.getValue()), true);
-
-                    Alarm myData;
-
-                    if (txtBusNumber == null) {
-                        myData = alarmChosenSwitch;
-                        myData.setIsActive(true);
-
-                    } else {
-                        myData = new Alarm(alarmId, bus, String.valueOf(number.getValue()),
-                                true, checkBoxVibrate.isChecked(), checkBoxSound.isChecked());
-
-                    }
-
-                    Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
-
-                    alarmIntent.putExtra("myDataSerialized", myData.serialize());
-
-                    PendingIntent appIntent = PendingIntent.getBroadcast(mContext, alarmId, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
-
-                    manager.set(AlarmManager.RTC_WAKEUP, date.getMillis(), appIntent);
-
-                    AlarmPersistence.saveAlarm(myData, mContext);
-
-                    if (!alarms.contains(myData)) {
-                        alarms.add(myData);
-
-                        if (alarms.size() == 1) {
-                            alarmExpandableAdapter.notifyDataSetChanged();
-                        }
-
-                        alarmExpandableAdapter.notifyParentItemInserted(alarms.size() - 1);
-                        alarmExpandableAdapter.collapseAllParents();
-                        alarmExpandableAdapter.expandParent(alarms.size() - 1);
-
-                        lmAlarms.scrollToPosition(alarms.size());
-
-                    } else {
-                        int position = alarms.indexOf(myData);
-                        alarmExpandableAdapter.notifyParentItemChanged(position);
-                        //lmAlarms.scrollToPosition(position);
-
-                    }
-
-                    updateListViewAlarms();
-
-
-                }
-            });
-
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (switchCurr != null)
-                        switchCurr.setChecked(false);
-                }
-            });
-
-
-            NumberPicker time = (NumberPicker) v.findViewById(R.id.numberPicker2);
-
-            timeBus = LocalTime.parse(bus.getTime());
-
-            LocalTime difference = timeBus.minusHours(LocalTime.now().getHourOfDay()).minusMinutes(LocalTime.now().getMinuteOfHour()).minusSeconds(LocalTime.now().getSecondOfMinute());
-
-            int val = difference.getMinuteOfHour();
-
-            time.setMinValue(1);
-            time.setMaxValue(val - 1);
-
-            time.setValue(val - 1);
-
-            builder.setView(v);
-
-            builder.show();
+            dialogPickIntervalAlarm(bus).show();
 
         }
     };
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.menu_main, menu);
-//
-//        return true;
-//    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onListItemExpanded(int position) {
-
-        //alarmExpandableAdapter.notifyParentItemChanged(position);
-        //alarmExpandableAdapter.expandParent(position);
-        //alarmExpandableAdapter.expandParent(alarm);
-        //alarmExpandableAdapter.onParentListItemExpanded(position);
-        //alarmExpandableAdapter.notifyDataSetChanged();
-
-        //alarmExpandableAdapter.notifyChildItemChanged(position,position);
-
-        //alarmExpandableAdapter.notify();
-        //String toastMsg = alarm.toString();
-        alarmExpandableAdapter.collapseAllParents();
-        alarmExpandableAdapter.expandParent(position);
-
-    }
-
-//    @Override
-//    protected void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        alarmExpandableAdapter.onSaveInstanceState(outState);
-//    }
-//
-//    @Override
-//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        alarmExpandableAdapter.onRestoreInstanceState(savedInstanceState);
-//    }
-
-    @Override
-    public void onListItemCollapsed(int position) {
-
-        alarmExpandableAdapter.collapseParent(position);
-        //alarmExpandableAdapter.notifyParentItemChanged(position);
-        //alarmExpandableAdapter.notify();
-    }
+    //------------------------------------------------AsyncTasks ----------------------------------
 
     public class LastBusAsync extends AsyncTask<String, List<Bus>, List<Bus>> {
 

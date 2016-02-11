@@ -28,7 +28,7 @@
         <receiver android:name="receivers.AlarmReceiver" >
             <intent-filter>
                 <action android:name="EXECUTE_ALARM_BUS" />
-
+                <action android:name="EXECUTE_ALARM_BUS_SCHEDULE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
@@ -43,6 +43,9 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
+        <service android:name="service.WSDublinBusService"
+            android:exported="false"/>
     </application>
 
 </manifest>
