@@ -18,13 +18,37 @@
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="23:59 am"
             android:textSize="28dp"
+            android:id="@+id/textAlarmTime"
+            android:visibility="gone"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="120dp"
+        android:layout_height="90dp"
+        android:id="@+id/linearLayoutQuickAlarm"
+        android:gravity="center_horizontal|center_vertical"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
+
+        <ImageView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:src="@drawable/ic_quick_alarm"
+            android:id="@+id/imageView2" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="Quick Alarm"
             android:id="@+id/textView3" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
         android:gravity="center_vertical"
-        android:layout_width="220dp"
+        android:layout_width="match_parent"
         android:layout_height="100dp"
         android:id="@+id/linearLayout3"
         android:layout_alignParentTop="true"
@@ -35,7 +59,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Label"
-            android:layout_marginLeft="15dp"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
             android:id="@+id/textViewAlarmLabel" />
 
         <TextView
@@ -44,7 +68,6 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Stop 1120"
             android:id="@+id/textViewStopNumber"
-            android:layout_marginLeft="15dp"
             android:layout_above="@+id/textViewTimeNotification"
             android:layout_alignParentStart="true" />
 
@@ -55,11 +78,10 @@
             android:text="Bus number"
             android:id="@+id/textViewBusNumber"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="15dp"
             android:layout_toEndOf="@+id/linearLayout" />
 
         <TextView
-            android:layout_width="200dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:text="Ballinter via O'Connell Street ---"
@@ -67,7 +89,6 @@
             android:singleLine="true"
             android:id="@+id/textViewRouteDescription"
             android:layout_below="@+id/textViewBusNumber"
-            android:layout_marginLeft="15dp"
             android:layout_toEndOf="@+id/linearLayout" />
 
     </LinearLayout>
@@ -79,8 +100,7 @@
         android:id="@+id/linearLayout4"
         android:gravity="center_horizontal"
         android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/linearLayout3">
+        android:layout_alignParentEnd="true">
 
         <Switch
             android:layout_width="wrap_content"

@@ -1,31 +1,20 @@
 package adapters;
 
-import android.app.AlarmManager;
-import android.app.Dialog;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
 
 import java.util.List;
 
-import entities.Alarm;
 import entities.Bus;
 import quartzo.com.dublinbusalarm.R;
-import utils.AlarmPersistence;
 
 /**
  * Created by victor on 06/12/15.

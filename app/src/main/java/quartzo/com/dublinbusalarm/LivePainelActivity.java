@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -17,27 +16,20 @@ import android.view.animation.AnimationUtils;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import adapters.ListBusAdapter;
 import decorator.SimpleDividerItemDecoration;
-import entities.Alarm;
+import entities.AlarmChild;
+import entities.AlarmParent;
 import entities.Bus;
-import entities.Constants;
+import utils.Utils;
 
 public class LivePainelActivity extends AppCompatActivity {
 
@@ -51,7 +43,7 @@ public class LivePainelActivity extends AppCompatActivity {
 
     Context mContext;
 
-    Alarm myData;
+    AlarmParent myData;
 
     boolean isFirsLoad;
     //ProgressDialog mProgressDialog;
@@ -71,7 +63,7 @@ public class LivePainelActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        myData = Alarm.create(getIntent().getStringExtra("myDataSerialized"));
+        myData = AlarmChild.create(getIntent().getStringExtra("myDataSerialized"));
 
         int mNotificationId = getIntent().getIntExtra("mNotificationId",0);
 
@@ -166,44 +158,7 @@ public class LivePainelActivity extends AppCompatActivity {
         @Override
         protected List<Bus> doInBackground(String... params) {
 
-            List<Bus> buses = new ArrayList<>();
-
-            try {
-
-                // Connect to the web site
-                Document document = Jsoup.connect(Constants.URL_DUBLIN_BUS + params[0]).get();
-                //Document document = Jsoup.connect(Constants.URL_DUBLIN_BUS).get();
-
-                // Get the html document title
-                Iterator<Element> table = document.select("table[id=rtpi-results]").select("tr").iterator();
-
-                if(table != null) {
-
-                    //Iterator<Element> ite = table.select("tr:contains(" + params[1] + " )").iterator();
-
-                    while (table.hasNext()) {
-                        Element ele = table.next();
-
-                        if (!ele.className().contains("yellow")) {
-                            Bus newBus = new Bus();
-
-                            newBus.setRoute(ele.select("td").get(Constants.ROUTE).text());
-                            newBus.setTime(ele.select("td").get(Constants.TIME).text());
-                            newBus.setDestination(ele.select("td").get(Constants.DESTINATION).text());
-
-
-                            buses.add(newBus);
-                        }
-                    }
-                    }
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            return buses;
+            return Utils.requestListBus(params);
         }
 
         @Override

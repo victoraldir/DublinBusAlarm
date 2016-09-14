@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import entities.Alarm;
+import entities.AlarmChild;
+import entities.AlarmParent;
 import entities.Constants;
 
 /**
@@ -21,12 +22,12 @@ public class AlarmPersistence {
     private static Gson gson = new Gson();
 
 
-    public static void saveAlarm(Alarm alarm, Context ctx){
+    public static void saveAlarm(AlarmChild alarm, Context ctx){
 
-        List<Alarm> alarms = readStoredAlarms(ctx);
+        List<AlarmChild> alarms = readStoredAlarms(ctx);
 
         if(alarms == null){
-            alarms = new ArrayList<Alarm>();
+            alarms = new ArrayList<AlarmChild>();
         }
 
         if(alarms.contains(alarm)){
@@ -45,14 +46,14 @@ public class AlarmPersistence {
         editor.commit();
     }
 
-    public static void deleteAlarm(Alarm alarm, Context ctx){
+    public static void deleteAlarm(AlarmParent alarm, Context ctx){
 
-        List<Alarm> alarms = readStoredAlarms(ctx);
+        List<AlarmChild> alarms = readStoredAlarms(ctx);
 
         Iterator it = alarms.iterator();
 
         while (it.hasNext()){
-            Alarm alarmCurr = (Alarm) it.next();
+            AlarmParent alarmCurr = (AlarmParent) it.next();
 
             if(alarmCurr.equals(alarm)){
                 it.remove();
@@ -73,9 +74,9 @@ public class AlarmPersistence {
         editor.commit();
     }
 
-    public static List<Alarm> readStoredAlarms(Context ctx) {
+    public static List<AlarmChild> readStoredAlarms(Context ctx) {
 
-        List<Alarm> alarms = new ArrayList<>();
+        List<AlarmChild> alarms = new ArrayList<>();
 
         SharedPreferences preferencesReader = ctx.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE);
 
@@ -83,10 +84,12 @@ public class AlarmPersistence {
         String serializedDataFromPreference = preferencesReader.getString(Constants.PREFS_KEY, null);
 
         // Create a new object from the serialized data with the same state
-        List alarmsDb = gson.fromJson(serializedDataFromPreference, new TypeToken<List<Alarm>>(){}.getType());
+        List alarmsDb = gson.fromJson(serializedDataFromPreference, new TypeToken<List<AlarmChild>>() {
+        }.getType());
 
         if(alarmsDb != null){
             alarms.addAll(alarmsDb);
+
         }
 
         //List<Alarm> alarms = new ArrayList<Alarm>();
@@ -96,4 +99,35 @@ public class AlarmPersistence {
         return  alarms;
     }
 
+    public static AlarmChild getAlarmById(int id, Context ctx) {
+
+        List<AlarmChild> alarms = new ArrayList<>();
+
+        SharedPreferences preferencesReader = ctx.getSharedPreferences(Constants.PREFS_NAME, Context.MODE_PRIVATE);
+
+        // Read the shared preference value
+        String serializedDataFromPreference = preferencesReader.getString(Constants.PREFS_KEY, null);
+
+        // Create a new object from the serialized data with the same state
+        List alarmsDb = gson.fromJson(serializedDataFromPreference, new TypeToken<List<AlarmChild>>(){}.getType());
+
+        if(alarmsDb != null){
+            alarms.addAll(alarmsDb);
+
+        }
+
+        if(!alarms.isEmpty()){
+            for (AlarmChild alarm: alarms) {
+                if(alarm.getId() == id){
+                    return alarm;
+                }
+            }
+        }
+
+        //List<Alarm> alarms = new ArrayList<Alarm>();
+
+        //alarms.add(restoredMyData);
+
+        return  null;
+    }
 }

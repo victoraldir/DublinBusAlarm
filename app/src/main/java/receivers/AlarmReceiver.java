@@ -11,9 +11,13 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 
-import entities.Alarm;
+import entities.AlarmChild;
+import entities.AlarmParent;
+import entities.DaysOfWeek;
 import quartzo.com.dublinbusalarm.LivePainelActivity;
 import quartzo.com.dublinbusalarm.R;
 import service.WSDublinBusService;
@@ -27,7 +31,9 @@ public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Alarm myData = Alarm.create(intent.getStringExtra("myDataSerialized"));
+        //AlarmChild myData = AlarmChild.create(intent.getStringExtra("myDataSerialized"));
+
+        AlarmChild myData = AlarmPersistence.getAlarmById(intent.getIntExtra("myAlarmId",0),context);
 
         if(intent.getAction().equals("EXECUTE_ALARM_BUS")) {
             //Toast.makeText(context, "I'm running", Toast.LENGTH_SHORT).show();
@@ -38,7 +44,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             it.putExtra("mNotificationId", myData.getId());
 
-            it.putExtra("myDataSerialized", intent.getStringExtra("myDataSerialized"));
+            it.putExtra("myDataSerialized", myData.serialize());
 
             it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
@@ -54,13 +60,19 @@ public class AlarmReceiver extends BroadcastReceiver {
             long[] pattern = {1000, 1000, 1000, 1000, 1000};
             Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 
-            int diff = LocalTime.parse(myData.getBus().getTime()).getMillisOfDay() - LocalTime.now().getMillisOfDay();
+            //int diff = LocalTime.parse(myData.getBus().getTime()).getMillisOfDay() - LocalTime.now().getMillisOfDay();
+
+            DateTime timeBus =  DateTime.now().withTime(LocalTime.parse(myData.getBus().getTime()));
+
+            long minDiff = timeBus.getMillis() - DateTime.now().getMillis();
+
+            LocalTime diff = LocalTime.fromMillisOfDay(minDiff);
 
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(context)
                             .setCategory(Notification.CATEGORY_ALARM)
                             .setSmallIcon(R.drawable.ic_notification)
-                            .setContentTitle("Bus " + myData.getBus().getRoute() + " is due in " + diff/1000 + " min")
+                            .setContentTitle("Bus " + myData.getBus().getRoute() + " is due in " + diff.getMinuteOfHour() + " min")
                             .setContentText("Time to go to bus stop " + myData.getBus().getStop())
                             .setPriority(Notification.PRIORITY_HIGH)
                             .setContentIntent(resultPendingIntent)
@@ -90,13 +102,14 @@ public class AlarmReceiver extends BroadcastReceiver {
             mNotifyMgr.notify(myData.getId(), notification);
         }else{
 
-            Intent msgIntent = new Intent(context, WSDublinBusService.class);
-//            msgIntent.putExtra(WSDublinBusService.BUS_NUMER, myData.getBus().getRoute());
-//            msgIntent.putExtra(WSDublinBusService.BUS_STOP, myData.getBus().getStop());
-            msgIntent.putExtra(WSDublinBusService.ALARM_SERIALIZED, myData.serialize());
 
-            msgIntent.putExtra(WSDublinBusService.INTERVAL, "10");
-            context.startService(msgIntent);
+            if(myData.getDays().contains(DaysOfWeek.values()[LocalDateTime.now().dayOfWeek().get() - 1])){
+                Intent msgIntent = new Intent(context, WSDublinBusService.class);
+                msgIntent.putExtra(WSDublinBusService.ALARM_SERIALIZED, myData.serialize());
+
+                msgIntent.putExtra(WSDublinBusService.INTERVAL, "10");
+                context.startService(msgIntent);
+            }
 
         }
     }

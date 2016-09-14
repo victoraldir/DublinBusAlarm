@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
@@ -30,7 +29,6 @@ import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
 import com.google.android.gms.analytics.HitBuilders;
@@ -38,25 +36,19 @@ import com.google.android.gms.analytics.Tracker;
 
 import org.joda.time.DateTime;
 import org.joda.time.LocalTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import adapters.AlarmExpandableAdapter;
 import adapters.ListBusAdapter;
 import decorator.SimpleDividerItemDecoration;
-import entities.Alarm;
+import entities.AlarmChild;
+import entities.AlarmParent;
 import entities.Bus;
 import entities.Constants;
 import utils.AlarmPersistence;
 import utils.UtilCheckConnectivity;
+import utils.Utils;
 
 public class MainActivity extends AppCompatActivity implements ExpandableRecyclerAdapter.ExpandCollapseListener {
 
@@ -79,13 +71,13 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
     private LocalTime timeBus;
 
-    private Alarm alarmChosenSwitch;
+    private AlarmChild alarmChosenSwitch;
 
     private Switch switchCurr;
 
     private AlarmExpandableAdapter alarmExpandableAdapter;
 
-    private List<Alarm> alarms;
+    private List<AlarmChild> alarms;
 
     private Tracker mTracker;
 
@@ -137,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
             @Override
             public void onClick(View v) {
                 isScheduled =true;
-                mTimePickerDialog = new TimePickerDialog(mContext,evtPickTime,LocalTime.now().getHourOfDay(),LocalTime.now().getMinuteOfHour(),true);
+                mTimePickerDialog = new TimePickerDialog(mContext,evtPickTime,LocalTime.now().getHourOfDay(),LocalTime.now().getMinuteOfHour(),Utils.is24Hours(mContext));
                 mTimePickerDialog.show();
             }
         });
@@ -230,6 +222,13 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
         alarmExpandableAdapter.collapseParent(position);
 
+//        if(!alarmExpandableAdapter.parentAlarmList.equals(alarms))
+//        alarms.addAll(alarmExpandableAdapter.parentAlarmList);
+
+        alarmExpandableAdapter.notifyChildItemChanged(position,0);
+        alarmExpandableAdapter.notifyParentItemChanged(position);
+
+
     }
 
     //------------------------------------------------Private Methods ---------------------------
@@ -274,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
         }
 
-        Alarm myData;
+        AlarmChild myData;
 
         if (txtBusNumber == null) {
             myData = alarmChosenSwitch;
@@ -282,8 +281,9 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
         } else {
             if (bus != null) {
-                myData = new Alarm(alarmId,0, bus, LocalTime.now().toString(Constants.TIME_MASK), "",
-                         true, checkBoxVibrate.isChecked(), checkBoxSound.isChecked(), false);
+                myData = new AlarmChild(alarmId,0, bus, "", "",
+                        true, checkBoxVibrate.isChecked(), checkBoxSound.isChecked(), false, AlarmChild.generateDaysWeek());
+
             } else {
 
                 Bus newBus = new Bus();
@@ -292,8 +292,9 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
                 newBus.setDestination("N/A");
                 newBus.setTime("00:00:00");
 
-                myData = new Alarm(alarmId, 0, newBus, LocalTime.now().toString(Constants.TIME_MASK) , "",
-                        true, checkBoxVibrate.isChecked(), checkBoxSound.isChecked(), true);
+                myData = new AlarmChild(alarmId, 0, newBus, LocalTime.now().toString(Constants.TIME_MASK) , "",
+                        true, checkBoxVibrate.isChecked(), checkBoxSound.isChecked(), true, AlarmChild.generateDaysWeek());
+
             }
 
         }
@@ -304,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
             alarmIntent = new Intent("EXECUTE_ALARM_BUS");
 
-            alarmIntent.putExtra("myDataSerialized", myData.serialize());
+            alarmIntent.putExtra("myAlarmId", myData.getId());
 
             PendingIntent appIntent = PendingIntent.getBroadcast(mContext, alarmId, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
 
@@ -314,27 +315,29 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
             alarmIntent = new Intent("EXECUTE_ALARM_BUS_SCHEDULE");
 
-            alarmIntent.putExtra("myDataSerialized", myData.serialize());
+            alarmIntent.putExtra("myAlarmId", myData.getId());
 
             PendingIntent appIntent = PendingIntent.getBroadcast(mContext, alarmId, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
 
-            manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, date.getMillis(), AlarmManager.INTERVAL_DAY, appIntent);
+            //manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, date.getMillis(), AlarmManager.INTERVAL_DAY, appIntent);
+            manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, DateTime.now().plusSeconds(30).getMillis(), AlarmManager.INTERVAL_DAY, appIntent);
         }
 
         AlarmPersistence.saveAlarm(myData, mContext);
 
         if (!alarms.contains(myData)) {
-            alarms.add(myData);
+            alarms.add(0, myData);
+
 
             if (alarms.size() == 1) {
                 alarmExpandableAdapter.notifyDataSetChanged();
             }
 
-            alarmExpandableAdapter.notifyParentItemInserted(alarms.size() - 1);
+            alarmExpandableAdapter.notifyParentItemInserted(0);
             alarmExpandableAdapter.collapseAllParents();
-            alarmExpandableAdapter.expandParent(alarms.size() - 1);
+            alarmExpandableAdapter.expandParent(0);
 
-            lmAlarms.scrollToPosition(alarms.size());
+            lmAlarms.scrollToPosition(0);
 
         } else {
             int position = alarms.indexOf(myData);
@@ -600,7 +603,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
             isScheduled = false;
             if (swt.isChecked()) {
                 if (UtilCheckConnectivity.isInternetAvailable(getSystemService(Context.CONNECTIVITY_SERVICE))) {
-                    Alarm alarm = (Alarm) v.getTag();
+                    AlarmChild alarm = (AlarmChild) v.getTag();
                     alarmChosenSwitch = alarm;
                     switchCurr = swt;
 
@@ -612,7 +615,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
             } else {
                 AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
-                Alarm alarm = (Alarm) v.getTag();
+                AlarmChild alarm = (AlarmChild) v.getTag();
 
                 Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
 
@@ -632,11 +635,15 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
             AlarmManager manager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
 
-            final Alarm alarm = (Alarm) v.getTag();
+            final AlarmChild alarm = (AlarmChild) v.getTag();
 
             Intent alarmIntent = new Intent("EXECUTE_ALARM_BUS");
 
             manager.cancel(PendingIntent.getBroadcast(mContext, alarm.getId(), alarmIntent, PendingIntent.FLAG_ONE_SHOT));
+
+            if(alarm.getIdNextAlarm() != 0){
+                manager.cancel(PendingIntent.getBroadcast(mContext, alarm.getIdNextAlarm(), alarmIntent, PendingIntent.FLAG_ONE_SHOT));
+            }
 
             AlarmPersistence.deleteAlarm(alarm, mContext);
 
@@ -645,6 +652,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
             alarms.remove(alarm);
 
             alarmExpandableAdapter.notifyParentItemRemoved(position);
+
 
             if (alarms.isEmpty()) {
                 updateListViewAlarms();
@@ -685,18 +693,22 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
     CompoundButton.OnCheckedChangeListener evtCheckVibrate = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            Alarm alarmTest = (Alarm) buttonView.getTag();
+            AlarmChild alarmTest = (AlarmChild) buttonView.getTag();
             alarmTest.setIsVibrate(isChecked);
             AlarmPersistence.saveAlarm(alarmTest, mContext);
+            alarms.set(alarms.indexOf(alarmTest),alarmTest);
+            //alarmExpandableAdapter.notifyChildItemChanged(alarms.indexOf(alarmTest),0);
         }
     };
 
     CompoundButton.OnCheckedChangeListener evtCheckSound = new CompoundButton.OnCheckedChangeListener() {
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            Alarm alarmTest = (Alarm) buttonView.getTag();
+            AlarmChild alarmTest = (AlarmChild) buttonView.getTag();
             alarmTest.setIsSound(isChecked);
             AlarmPersistence.saveAlarm(alarmTest, mContext);
+            alarms.set(alarms.indexOf(alarmTest),alarmTest);
+            //alarmExpandableAdapter.notifyChildItemChanged(alarms.indexOf(alarmTest),0);
         }
     };
 
@@ -738,57 +750,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
                     isSwitcher = true;
             }
 
-            List<Bus> buses = new ArrayList<>();
-
-            try {
-
-                // Connect to the web site
-                Document document = Jsoup.connect(Constants.URL_DUBLIN_BUS + params[0]).get();
-                //Document document = Jsoup.connect(Constants.URL_DUBLIN_BUS).get();
-
-
-                Iterator<Element> table;
-
-                // Get the html document title
-                if(!params[1].equals("")) {
-                    table = document.select("table[id=rtpi-results]").select("tr:contains(" + params[1] + " )").iterator();
-
-                }else{
-                    table = document.select("table[id=rtpi-results]").select("tr").iterator();
-                }
-
-                if (table != null) {
-
-                    //Iterator<Element> ite = table.select("tr:contains(" + params[1] + " )").iterator();
-
-                    while (table.hasNext()) {
-                        Element ele = table.next();
-                        //String curr = ele.select("td").get(Constants.DESTINATION).text();
-
-                        if (!ele.className().contains("yellow")) {
-                            if (!ele.select("td").get(Constants.TIME).text().equalsIgnoreCase("Due") &&
-                                    !ele.select("td").get(Constants.TIME).text().equalsIgnoreCase("0") &&
-                                    !ele.select("td").get(Constants.TIME).text().equalsIgnoreCase("1")) {
-
-                                Bus newBus = new Bus();
-
-                                newBus.setTime(ele.select("td").get(Constants.TIME).text());
-                                newBus.setRoute(ele.select("td").get(Constants.ROUTE).text());
-                                newBus.setDestination(ele.select("td").get(Constants.DESTINATION).text());
-                                newBus.setStop(params[0]);
-
-                                buses.add(newBus);
-                            }
-                        }
-                    }
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            return buses;
+            return Utils.requestListBus(params);
         }
 
         @Override

@@ -5,6 +5,8 @@ import android.app.Application;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 /**
  * Created by victoraldir on 26/01/16.
  */
@@ -22,5 +24,11 @@ public class AnalyticsApplication extends Application {
             mTracker = analytics.newTracker(R.xml.app_tracker);
         }
         return mTracker;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        JodaTimeAndroid.init(this);
     }
 }
