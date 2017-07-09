@@ -1,7 +1,6 @@
 package quartzo.com.dublinbusalarm;
 
 import android.app.AlarmManager;
-import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
@@ -18,14 +17,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.NumberPicker;
 import android.widget.Switch;
 import android.widget.TimePicker;
 
@@ -41,17 +37,16 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import decorator.SimpleDividerItemDecoration;
-import dialogs.CustomDialog;
 import entities.AlarmChild;
 import entities.Bus;
 import entities.Constants;
-import fragments.AlarmRegisterDialogFragment;
+import fragments.BusStopFormDialogFragment;
 import utils.AlarmPersistence;
 import utils.UtilCheckConnectivity;
 
 
 public class MainActivity extends AppCompatActivity implements ExpandableRecyclerAdapter.ExpandCollapseListener,
-        AlarmRegisterDialogFragment.AlarmRegisterListener{
+        BusStopFormDialogFragment.BusStopFormListener {
 
     public static final String TAG_PICK_BUS = "dialogPickBus";
 
@@ -153,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
     void showDialog() {
 
-        DialogFragment newFragment = AlarmRegisterDialogFragment.newInstance();
+        DialogFragment newFragment = BusStopFormDialogFragment.newInstance();
         newFragment.show(getSupportFragmentManager(), TAG_PICK_BUS);
 
     }
@@ -467,18 +462,9 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         }
     }
 
-    @Override
-    public void onSetTime() {
-
-    }
 
     @Override
-    public void onSetInterval() {
-
-    }
-
-    @Override
-    public void onSetBus() {
+    public void onSetBusStop() {
         Snackbar.make(mCoordinatorLayout,"Bus choiced",Snackbar.LENGTH_SHORT).show();
     }
 }

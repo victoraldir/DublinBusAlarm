@@ -107,11 +107,11 @@ public class ListBusAdapter extends RecyclerView.Adapter<ListBusAdapter.BusViewH
         public BusViewHolder(View v) {
             super(v);
 
-            textViewRoute = (TextView) v.findViewById(R.id.textViewRoute);
-
-            textViewMinutes = (TextView) v.findViewById(R.id.textViewMinutes);
-
-            textViewDestination = (TextView) v.findViewById(R.id.textViewDestination);
+//            textViewRoute = (TextView) v.findViewById(R.id.textViewRoute);
+//
+//            textViewMinutes = (TextView) v.findViewById(R.id.textViewMinutes);
+//
+//            textViewDestination = (TextView) v.findViewById(R.id.textViewDestination);
 
         }
     }

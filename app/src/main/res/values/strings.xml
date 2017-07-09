@@ -11,4 +11,5 @@
     <string name="pick_bus">Pick a bus</string>
     <string name="btn_next">Next</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="min">Min</string>
 </resources>

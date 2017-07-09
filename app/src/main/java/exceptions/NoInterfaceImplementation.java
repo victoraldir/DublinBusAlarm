@@ -1,6 +1,6 @@
 package exceptions;
 
-import fragments.AlarmRegisterDialogFragment;
+import fragments.BusStopFormDialogFragment;
 
 /**
  * Created by victoraldir on 08/07/2017.
@@ -9,7 +9,7 @@ import fragments.AlarmRegisterDialogFragment;
 public class NoInterfaceImplementation extends RuntimeException {
 
     public NoInterfaceImplementation(){
-        super(AlarmRegisterDialogFragment.AlarmRegisterListener.class.getSimpleName() + " not implemented!");
+        super(BusStopFormDialogFragment.BusStopFormListener.class.getSimpleName() + " not implemented!");
     }
 
 }

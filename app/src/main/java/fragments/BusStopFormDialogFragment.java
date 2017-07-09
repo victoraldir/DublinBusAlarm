@@ -16,12 +16,12 @@ import quartzo.com.dublinbusalarm.R;
  * Created by victoraldir on 08/07/2017.
  */
 
-public class AlarmRegisterDialogFragment extends DialogFragment {
+public class BusStopFormDialogFragment extends DialogFragment {
 
-    private AlarmRegisterListener mListener;
+    private BusStopFormListener mListener;
 
-    public static AlarmRegisterDialogFragment newInstance() {
-        return new AlarmRegisterDialogFragment();
+    public static BusStopFormDialogFragment newInstance() {
+        return new BusStopFormDialogFragment();
     }
 
     @NonNull
@@ -37,7 +37,7 @@ public class AlarmRegisterDialogFragment extends DialogFragment {
                 .setPositiveButton(R.string.btn_next, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        mListener.onSetBus();
+                        mListener.onSetBusStop();
                         dialogInterface.dismiss();
                     }
                 })
@@ -50,18 +50,16 @@ public class AlarmRegisterDialogFragment extends DialogFragment {
 
         super.onAttach(context);
 
-        if(context instanceof AlarmRegisterListener){
-            mListener = (AlarmRegisterListener) context;
+        if(context instanceof BusStopFormListener){
+            mListener = (BusStopFormListener) context;
         }else {
             throw new NoInterfaceImplementation();
         }
 
     }
 
-    public interface AlarmRegisterListener{
-        void onSetTime();
-        void onSetInterval();
-        void onSetBus();
+    public interface BusStopFormListener {
+        void onSetBusStop();
     }
 
 }
