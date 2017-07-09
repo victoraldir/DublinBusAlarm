@@ -17,9 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
-
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -29,7 +26,7 @@ import decorator.SimpleDividerItemDecoration;
 import entities.AlarmChild;
 import entities.AlarmParent;
 import entities.Bus;
-import utils.Utils;
+
 
 public class LivePainelActivity extends AppCompatActivity {
 
@@ -53,8 +50,6 @@ public class LivePainelActivity extends AppCompatActivity {
     private ProgressBar progressBar;
 
     private TextView txtNoData;
-
-    private Tracker mTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,9 +106,6 @@ public class LivePainelActivity extends AppCompatActivity {
 
         new LastBusAsync().execute(myData.getBus().getStop());
 
-        AnalyticsApplication application = (AnalyticsApplication) getApplication();
-        mTracker = application.getDefaultTracker();
-
     }
 
     @Override
@@ -137,8 +129,6 @@ public class LivePainelActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mTracker.setScreenName("Image~" + LivePainelActivity.class);
-        mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     }
 
     public class LastBusAsync extends AsyncTask<String, List<Bus>, List<Bus>> {
@@ -146,19 +136,13 @@ public class LivePainelActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-//            if(!isFirsLoad){
-//                viewSwitcher.getNextView();
-//            }else{
-//                isFirsLoad = false;
-//            }
-
-
         }
 
         @Override
         protected List<Bus> doInBackground(String... params) {
 
-            return Utils.requestListBus(params);
+            //return Utils.requestListBus(params);
+            return null;
         }
 
         @Override

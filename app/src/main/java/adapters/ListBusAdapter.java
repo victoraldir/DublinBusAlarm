@@ -28,15 +28,20 @@ public class ListBusAdapter extends RecyclerView.Adapter<ListBusAdapter.BusViewH
     AlertDialog listDialog;
     AdapterView.OnClickListener evtClickBus;
 
-    public ListBusAdapter(List<Bus> catList, Context ctx, AlertDialog listDialog, AdapterView.OnClickListener evtClickBus) {
+    public ListBusAdapter(Context ctx, AlertDialog listDialog, AdapterView.OnClickListener evtClickBus) {
 
         //this.busesLayoutId = R.layout.layout_list_bus_adapter;
-        this.busList = catList;
         this.ctx = ctx;
         //this.timeCurr = timeCurr;
         this.listDialog = listDialog;
         this.evtClickBus = evtClickBus;
 
+    }
+
+    public void swap(List<Bus> busList){
+        if(busList != null && !busList.isEmpty()){
+            this.busList = busList;
+        }
     }
 
     public ListBusAdapter(List<Bus> catList, Context ctx) {

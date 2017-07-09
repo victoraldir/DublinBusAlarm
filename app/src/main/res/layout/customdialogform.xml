@@ -2,13 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/busStopdWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:errorEnabled="true"
+        android:hint="@string/bus_stop"
+        app:errorTextAppearance="@string/erro"
        >
 
         <EditText
@@ -27,6 +30,9 @@
         android:id="@+id/busNumberWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:errorTextAppearance="@string/erro_inform_route"
+        android:hint="@string/bus_numer"
+        app:errorEnabled="true"
         >
 
         <EditText

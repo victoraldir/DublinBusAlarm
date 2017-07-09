@@ -24,4 +24,8 @@
 
     </style>
 
+    <style name="myStyle">
+        <item name="android:textColor">#FF255F26</item>
+    </style>
+
 </resources>

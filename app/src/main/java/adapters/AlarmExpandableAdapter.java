@@ -37,7 +37,7 @@ import entities.DaysOfWeek;
 import quartzo.com.dublinbusalarm.LivePainelActivity;
 import quartzo.com.dublinbusalarm.R;
 import utils.AlarmPersistence;
-import utils.Utils;
+
 
 
 /**
@@ -69,7 +69,11 @@ public class AlarmExpandableAdapter extends ExpandableRecyclerAdapter<AlarmExpan
         //this.df = new SimpleDateFormat(DateFormat.is24HourFormat(mContext) ? Constants.TIME_MASK_24 : Constants.TIME_MASK_12);
 
         this.inFormat = new SimpleDateFormat( "HH:mm:ss");
-        this.outFormat = new SimpleDateFormat(Utils.is24Hours(mContext) ? Constants.TIME_MASK_24 : Constants.TIME_MASK_12);
+        //this.outFormat = new SimpleDateFormat(Utils.is24Hours(mContext) ? Constants.TIME_MASK_24 : Constants.TIME_MASK_12);
+    }
+
+    public void swap(List<AlarmChild> parentAlarmList){
+        this.parentAlarmList = parentAlarmList;
     }
 
     @Override

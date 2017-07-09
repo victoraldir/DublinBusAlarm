@@ -1,5 +1,14 @@
 <resources>
+
+
+    <string name="erro_inform_route">"You must to inform a valid route"</string>
+    <string name="bus_numer">"Bus number (optional)"</string>
+    <string name="erro">"You must to inform a valid bus stop"</string>
+    <string name="bus_stop">Bus stop</string>
     <string name="app_name">Alarm Bus Dublin</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_live_painel">Alarm Bus Dublin</string>
+    <string name="pick_bus">Pick a bus</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_cancel">Cancel</string>
 </resources>

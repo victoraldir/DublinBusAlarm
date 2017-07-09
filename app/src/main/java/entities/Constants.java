@@ -1,7 +1,5 @@
 package entities;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 
 /**
  * Created by victor on 27/12/15.

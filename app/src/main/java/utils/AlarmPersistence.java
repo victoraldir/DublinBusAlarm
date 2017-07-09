@@ -1,7 +1,10 @@
 package utils;
 
+import android.app.IntentService;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -12,14 +15,21 @@ import java.util.List;
 
 import entities.AlarmChild;
 import entities.AlarmParent;
+import entities.Bus;
 import entities.Constants;
 
 /**
  * Created by victor on 28/12/15.
  */
-public class AlarmPersistence {
+public class AlarmPersistence extends IntentService {
+
+    private static final String TAG = AlarmPersistence.class.getSimpleName();
 
     private static Gson gson = new Gson();
+
+    public AlarmPersistence() {
+        super(TAG);
+    }
 
 
     public static void saveAlarm(AlarmChild alarm, Context ctx){
@@ -129,5 +139,14 @@ public class AlarmPersistence {
         //alarms.add(restoredMyData);
 
         return  null;
+    }
+
+    public static void saveAlarm(int minutes, Bus bus) {
+
+    }
+
+    @Override
+    protected void onHandleIntent(@Nullable Intent intent) {
+
     }
 }

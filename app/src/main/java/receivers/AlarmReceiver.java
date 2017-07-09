@@ -20,7 +20,6 @@ import entities.AlarmParent;
 import entities.DaysOfWeek;
 import quartzo.com.dublinbusalarm.LivePainelActivity;
 import quartzo.com.dublinbusalarm.R;
-import service.WSDublinBusService;
 import utils.AlarmPersistence;
 
 /**
@@ -104,11 +103,11 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 
             if(myData.getDays().contains(DaysOfWeek.values()[LocalDateTime.now().dayOfWeek().get() - 1])){
-                Intent msgIntent = new Intent(context, WSDublinBusService.class);
-                msgIntent.putExtra(WSDublinBusService.ALARM_SERIALIZED, myData.serialize());
+//                Intent msgIntent = new Intent(context, WSDublinBusService.class);
+//                msgIntent.putExtra(WSDublinBusService.ALARM_SERIALIZED, myData.serialize());
 
-                msgIntent.putExtra(WSDublinBusService.INTERVAL, "10");
-                context.startService(msgIntent);
+//                msgIntent.putExtra(WSDublinBusService.INTERVAL, "10");
+//                context.startService(msgIntent);
             }
 
         }
