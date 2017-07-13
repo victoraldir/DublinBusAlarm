@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import adapters.ListBusAdapter;
 import decorator.SimpleDividerItemDecoration;
 import entities.AlarmChild;
 import entities.AlarmParent;
@@ -150,7 +149,7 @@ public class LivePainelActivity extends AppCompatActivity {
 
             if(!result.isEmpty()) {
                 layout.setVisibility(View.GONE);
-                listBusesLive.setAdapter(new ListBusAdapter(result, mContext));
+                //listBusesLive.setAdapter(new ListBusAdapter(result, mContext));
                 listBusesLive.setVisibility(View.VISIBLE);
             }else{
                 progressBar.setVisibility(View.GONE);

@@ -8,8 +8,10 @@
     <string name="app_name">Alarm Bus Dublin</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_live_painel">Alarm Bus Dublin</string>
+    <string name="pick_bus_stop">What\'s your station?</string>
     <string name="pick_bus">Pick a bus</string>
     <string name="btn_next">Next</string>
     <string name="btn_cancel">Cancel</string>
     <string name="min">Min</string>
+    <string name="bus_stop_not_empty">Bus stop number cannot be empty</string>
 </resources>

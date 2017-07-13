@@ -32,7 +32,6 @@ import org.joda.time.LocalTime;
 import java.util.List;
 
 import adapters.AlarmExpandableAdapter;
-import adapters.ListBusAdapter;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -41,14 +40,18 @@ import entities.AlarmChild;
 import entities.Bus;
 import entities.Constants;
 import fragments.BusStopFormDialogFragment;
+import fragments.ListTransportDialogFragment;
 import utils.AlarmPersistence;
 import utils.UtilCheckConnectivity;
 
 
 public class MainActivity extends AppCompatActivity implements ExpandableRecyclerAdapter.ExpandCollapseListener,
-        BusStopFormDialogFragment.BusStopFormListener {
+        BusStopFormDialogFragment.BusStopFormListener,
+        ListTransportDialogFragment.ListTransportListener{
 
+    public static final String TAG_PICK_STATION = "dialogPickStation";
     public static final String TAG_PICK_BUS = "dialogPickBus";
+
 
     ProgressDialog mProgressDialog;
     private Context mContext;
@@ -68,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
     private CheckBox checkBoxSound;
     private LocalTime timePicked;
     private CheckBox checkBoxVibrate;
-    private ListBusAdapter mAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,17 +87,17 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
         mContext = this;
 
-        mAdapter = new ListBusAdapter(mContext, listDialog, evtClickBus);
+        //mAdapter = new ListBusAdapter(mContext, listDialog, evtClickBus);
 
         RecyclerView listBuses = new RecyclerView(mContext);
         listBuses.setLayoutManager(new LinearLayoutManager(mContext));
         listBuses.setHasFixedSize(true);
         listBuses.addItemDecoration(new SimpleDividerItemDecoration(this));
-        mAdapter = new ListBusAdapter(mContext, listDialog, evtClickBus);
-        listBuses.setAdapter(mAdapter);
+
+
 
         listAlarms = (RecyclerView) findViewById(R.id.listViewAlarms);
-        listAlarms.setAdapter(mAdapter);
+
         listAlarms.setLayoutManager(lmAlarms);
         listAlarms.setHasFixedSize(true);
         listAlarms.addItemDecoration(new SimpleDividerItemDecoration(this));
@@ -149,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
     void showDialog() {
 
         DialogFragment newFragment = BusStopFormDialogFragment.newInstance();
-        newFragment.show(getSupportFragmentManager(), TAG_PICK_BUS);
+        newFragment.show(getSupportFragmentManager(), TAG_PICK_STATION);
 
     }
 
@@ -446,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
                 //listBuses.setAdapter(new ListBusAdapter(result, mContext, listDialog, evtClickBus));
 
-                mAdapter.swap(result);
+
 
                 //listDialog.setView(listBuses);
 
@@ -464,7 +467,13 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
 
     @Override
-    public void onSetBusStop() {
-        Snackbar.make(mCoordinatorLayout,"Bus choiced",Snackbar.LENGTH_SHORT).show();
+    public void onSetBusStop(String busSopNumber, String busNumber) {
+        ListTransportDialogFragment newFragment = ListTransportDialogFragment.newInstance(busSopNumber,busNumber);
+        newFragment.show(getSupportFragmentManager(), TAG_PICK_BUS);
+    }
+
+    @Override
+    public void onSetBus() {
+
     }
 }
