@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -24,8 +26,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
+import com.entities.Transport;
 
 import org.joda.time.LocalTime;
 
@@ -52,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
     public static final String TAG_PICK_STATION = "dialogPickStation";
     public static final String TAG_PICK_BUS = "dialogPickBus";
 
+    public static final String TAG_DIALOG = "dialog";
 
     ProgressDialog mProgressDialog;
     private Context mContext;
@@ -447,12 +452,6 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
 
             if(!result.isEmpty()) {
 
-                //listBuses.setAdapter(new ListBusAdapter(result, mContext, listDialog, evtClickBus));
-
-
-
-                //listDialog.setView(listBuses);
-
                 listDialog.show();
 
             }else{
@@ -465,15 +464,30 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         }
     }
 
+    public void showDialog(DialogFragment dialogFragment){
 
-    @Override
-    public void onSetBusStop(String busSopNumber, String busNumber) {
-        ListTransportDialogFragment newFragment = ListTransportDialogFragment.newInstance(busSopNumber,busNumber);
-        newFragment.show(getSupportFragmentManager(), TAG_PICK_BUS);
+
+        // DialogFragment.show() will take care of adding the fragment
+        // in a transaction.  We also want to remove any currently showing
+        // dialog, so make our own transaction and take care of that here.
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag(TAG_DIALOG);
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        dialogFragment.show(ft, TAG_DIALOG);
     }
 
     @Override
-    public void onSetBus() {
+    public void onSetBusStop(String busSopNumber, String busNumber) {
+        showDialog(ListTransportDialogFragment.newInstance(busSopNumber,busNumber));
+    }
 
+    @Override
+    public void onSetTransport(Transport transport) {
+        Snackbar.make(mCoordinatorLayout,transport.getRoute() + " clicked",Snackbar.LENGTH_SHORT).show();
     }
 }

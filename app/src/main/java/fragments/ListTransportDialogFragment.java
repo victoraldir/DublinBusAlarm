@@ -81,7 +81,7 @@ public class ListTransportDialogFragment extends DialogFragment {
         mRecyclerView = (RecyclerView) v.findViewById(R.id.recycle_transport_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mAdapter = new TransportAdapter(new ArrayList<Transport>());
+        mAdapter = new TransportAdapter(new ArrayList<Transport>(),mListener);
         mRecyclerView.setAdapter(mAdapter);
 
         return v;
@@ -106,7 +106,7 @@ public class ListTransportDialogFragment extends DialogFragment {
     }
 
     public interface ListTransportListener {
-        void onSetBus();
+        void onSetTransport(Transport transport);
     }
 
     public class LoadTransportsAsyncTask extends AsyncTask<String, Object, List<Transport>>{

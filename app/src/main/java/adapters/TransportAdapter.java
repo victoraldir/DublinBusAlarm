@@ -8,10 +8,14 @@ import android.widget.TextView;
 
 import com.entities.Transport;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import fragments.ListTransportDialogFragment;
 import quartzo.com.dublinbusalarm.R;
+import utils.DateUtils;
 
 /**
  * Created by victoraldir on 12/07/2017.
@@ -20,9 +24,12 @@ import quartzo.com.dublinbusalarm.R;
 public class TransportAdapter extends RecyclerView.Adapter<TransportAdapter.ViewHolder> {
 
     private List<Transport> mTransportList;
+    private ListTransportDialogFragment.ListTransportListener mListener;
 
-    public TransportAdapter(List<Transport> transportList){
+    public TransportAdapter(List<Transport> transportList,
+                            ListTransportDialogFragment.ListTransportListener listener){
         mTransportList = transportList;
+        mListener = listener;
     }
 
     public void swap(List<Transport> transportList){
@@ -42,11 +49,18 @@ public class TransportAdapter extends RecyclerView.Adapter<TransportAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        Transport transport = mTransportList.get(position);
+        final Transport transport = mTransportList.get(position);
 
         holder.textViewDestination.setText(transport.getDestination());
-        holder.textViewMinutes.setText(transport.getExpectedTime());
+        holder.textViewMinutes.setText(DateUtils.getIntervalMinutes(transport.getExpectedTime()));
         holder.textViewRoute.setText(transport.getRoute());
+
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onSetTransport(transport);
+            }
+        });
 
     }
 
