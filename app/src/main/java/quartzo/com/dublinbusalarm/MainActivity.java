@@ -26,7 +26,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.bignerdranch.expandablerecyclerview.Adapter.ExpandableRecyclerAdapter;
 import com.entities.Transport;
@@ -46,6 +45,7 @@ import entities.Constants;
 import fragments.BusStopFormDialogFragment;
 import fragments.ListTransportDialogFragment;
 import utils.AlarmPersistence;
+import utils.StringUtils;
 import utils.UtilCheckConnectivity;
 
 
@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
     private CheckBox checkBoxSound;
     private LocalTime timePicked;
     private CheckBox checkBoxVibrate;
+
+    public static String mBusStationFromActivityResult;
 
 
     @Override
@@ -159,18 +161,6 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
         DialogFragment newFragment = BusStopFormDialogFragment.newInstance();
         newFragment.show(getSupportFragmentManager(), TAG_PICK_STATION);
 
-    }
-
-//    @OnClick(R.id.fab3)
-//    public void showDialogTimePicker() {
-//        isScheduled =true;
-//        mTimePickerDialog = new TimePickerDialog(mContext,evtPickTime,LocalTime.now().getHourOfDay(),LocalTime.now().getMinuteOfHour(),Utils.is24Hours(mContext));
-//        mTimePickerDialog.show();
-//    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     @Override
@@ -485,6 +475,28 @@ public class MainActivity extends AppCompatActivity implements ExpandableRecycle
     public void onSetBusStop(String busSopNumber, String busNumber) {
         showDialog(ListTransportDialogFragment.newInstance(busSopNumber,busNumber));
     }
+
+    @Override
+    public void onPickBusStopMap() {
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if(resultCode != RESULT_CANCELED){
+
+            if(resultCode == MarkerActivity.RC_PICK_PLACE){
+                mBusStationFromActivityResult = StringUtils.sanitizeBusStation(
+                        data.getStringExtra(MarkerActivity.EXTRA_BUS_STATION));
+                Snackbar.make(mCoordinatorLayout,mBusStationFromActivityResult,Snackbar.LENGTH_SHORT).show();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+
 
     @Override
     public void onSetTransport(Transport transport) {

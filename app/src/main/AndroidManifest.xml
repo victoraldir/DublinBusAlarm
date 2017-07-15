@@ -12,6 +12,11 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="YOUR_API_KEY_GOES_HERE" />
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -23,6 +28,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".MarkerActivity"
+            android:parentActivityName=".MainActivity"/>
 
         <receiver android:name="receivers.AlarmReceiver" >
             <intent-filter>
@@ -40,11 +48,6 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
-
-
-        <service
-            android:name="service.WSDublinBusService"
-            android:exported="false" />
     </application>
 
 </manifest>

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import exceptions.NoInterfaceImplementation;
+import quartzo.com.dublinbusalarm.MainActivity;
+import quartzo.com.dublinbusalarm.MarkerActivity;
 import quartzo.com.dublinbusalarm.R;
 
 /**
@@ -22,7 +25,14 @@ import quartzo.com.dublinbusalarm.R;
 
 public class BusStopFormDialogFragment extends DialogFragment {
 
+    public static final String ARG_BUS_STOP = "busStop";
+    private EditText mEditTextBusStop;
+
     private BusStopFormListener mListener;
+
+    public void seBusStop(String busStop){
+        mEditTextBusStop.setText(busStop);
+    }
 
     public static BusStopFormDialogFragment newInstance() {
         return new BusStopFormDialogFragment();
@@ -41,7 +51,19 @@ public class BusStopFormDialogFragment extends DialogFragment {
 
         View view = getActivity().getLayoutInflater().inflate(R.layout.customdialogform, null);
 
-        final EditText editTextBusStop = (EditText) view.findViewById(R.id.editTextBusStop);
+        Button btnMap= (Button) view.findViewById(R.id.btn_map);
+
+        btnMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent it = new Intent(getActivity(), MarkerActivity.class);
+                startActivityForResult(it,MarkerActivity.RC_PICK_PLACE);
+
+            }
+        });
+
+        mEditTextBusStop = (EditText) view.findViewById(R.id.editTextBusStop);
         final EditText editTextBusNumber = (EditText) view.findViewById(R.id.editTextBusNumber);
 
         final TextInputLayout busStopdWrapper = (TextInputLayout) view.findViewById(R.id.busStopdWrapper);
@@ -65,12 +87,12 @@ public class BusStopFormDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(View view) {
 
-                        if(editTextBusStop.getText().toString().isEmpty()){
+                        if(mEditTextBusStop.getText().toString().isEmpty()){
 
                             busStopdWrapper.setError(getString(R.string.bus_stop_not_empty));
 
                         }else{
-                            mListener.onSetBusStop(editTextBusStop.getText().toString(),
+                            mListener.onSetBusStop(mEditTextBusStop.getText().toString(),
                                     editTextBusNumber.getText().toString());
 
                             dialogInterface.dismiss();
@@ -95,11 +117,29 @@ public class BusStopFormDialogFragment extends DialogFragment {
         }else {
             throw new NoInterfaceImplementation();
         }
+    }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(getActivity() instanceof MainActivity){
+
+            if(((MainActivity) getActivity()).mBusStationFromActivityResult != null){
+                seBusStop(((MainActivity) getActivity()).mBusStationFromActivityResult);
+            }
+
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
     }
 
     public interface BusStopFormListener {
         void onSetBusStop(String busStop, String bus);
+        void onPickBusStopMap();
     }
 
 }
